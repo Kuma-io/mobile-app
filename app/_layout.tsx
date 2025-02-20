@@ -6,14 +6,13 @@ import {
   Inter_800ExtraBold,
   Inter_900Black,
 } from "@expo-google-fonts/inter";
-import { PrivyElements, PrivyProvider } from "@privy-io/expo";
-import Constants from "expo-constants";
+import { PrivyProvider } from "@privy-io/expo";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "../global.css";
-
+import { Toaster } from "sonner-native";
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
@@ -38,14 +37,14 @@ export default function RootLayout() {
 
   return (
     <PrivyProvider
-      appId={Constants.expoConfig?.extra?.privyAppId}
-      clientId={Constants.expoConfig?.extra?.privyClientId}
+      appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID as string}
+      clientId={process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID as string}
     >
       <GestureHandlerRootView style={{ flex: 1 }}>
         <Stack>
           <Stack.Screen name="index" />
         </Stack>
-        <PrivyElements />
+        <Toaster invert />
       </GestureHandlerRootView>
     </PrivyProvider>
   );
