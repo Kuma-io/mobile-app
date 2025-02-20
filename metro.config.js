@@ -10,10 +10,19 @@ const { withNativeWind } = require("nativewind/metro");
 const config = getDefaultConfig(__dirname);
 const modulesToEnableExports = ["@privy-io/expo", "@privy-io/expo/passkey"];
 
-// config.transformer = {
-//   ...config.transformer,
-//   babelTransformerPath: require.resolve("react-native-svg-transformer"),
-// };
+// Add support for SVG
+const { transformer, resolver } = config;
+
+config.transformer = {
+  ...transformer,
+  babelTransformerPath: require.resolve("react-native-svg-transformer"),
+};
+
+config.resolver = {
+  ...resolver,
+  assetExts: resolver.assetExts.filter((ext) => ext !== "svg"),
+  sourceExts: [...resolver.sourceExts, "svg"],
+};
 
 const resolveRequestWithPackageExports = (context, moduleName, platform) => {
   if (modulesToEnableExports.includes(moduleName)) {
