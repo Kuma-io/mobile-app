@@ -1,16 +1,16 @@
-import React, { useState, useCallback } from "react";
-import { Text, TextInput, View, Button, ScrollView } from "react-native";
+import React, { useCallback, useState } from "react";
+import { Button, ScrollView, Text, TextInput, View } from "react-native";
 
 import {
-  usePrivy,
-  useOAuthFlow,
-  useEmbeddedWallet,
   getUserEmbeddedWallet,
   PrivyEmbeddedWalletProvider,
+  useEmbeddedWallet,
+  useOAuthFlow,
+  usePrivy,
 } from "@privy-io/expo";
-import Constants from "expo-constants";
 import { useLinkWithPasskey } from "@privy-io/expo/passkey";
 import { PrivyUser } from "@privy-io/public-api";
+import Constants from "expo-constants";
 
 const toMainIdentifier = (x: PrivyUser["linked_accounts"][number]) => {
   if (x.type === "phone") {
@@ -118,12 +118,12 @@ export const UserScreen = () => {
           }}
         >
           <View>
-            <Text style={{ fontWeight: "bold" }}>User ID</Text>
+            <Text className="text-2xl font-bold">User ID</Text>
             <Text>{user.id}</Text>
           </View>
 
           <View>
-            <Text style={{ fontWeight: "bold" }}>Linked accounts</Text>
+            <Text className="font-bold">Linked accounts</Text>
             {user?.linked_accounts.length ? (
               <View style={{ display: "flex", flexDirection: "column" }}>
                 {user?.linked_accounts?.map((m) => (

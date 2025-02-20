@@ -15,7 +15,7 @@
     "ios": {
       "usesAppleSignIn": true,
       "supportsTablet": true,
-      "bundleIdentifier": "dev.privy.example",
+      "bundleIdentifier": "com.test.kuma",
       "associatedDomains": ["webcredentials:<your-associated-domain>"],
       "infoPlist": {
         "NSAppTransportSecurity": {
@@ -28,7 +28,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "dev.privy.example"
+      "package": "com.test.kuma"
     },
     "web": {
       "bundler": "metro",
@@ -36,8 +36,8 @@
       "favicon": "./assets/images/favicon.png"
     },
     "extra": {
-      "privyAppId": "<your-privy-app-id>",
-      "privyClientId": "<your-privy-app-client-id>",
+      "privyAppId": "clu7m7ye30hjzey4dp7byyvok",
+      "privyClientId": "client-WY2jPdxGstKyN1bAmgECTcjE873iTVGiEskRBgZyf6Hir",
       "passkeyAssociatedDomain": "https://<your-associated-domain>"
     },
     "plugins": [

@@ -1,4 +1,5 @@
 const { getDefaultConfig, mergeConfig } = require("@expo/metro-config");
+const { withNativeWind } = require("nativewind/metro");
 
 /**
  * Metro configuration
@@ -8,6 +9,11 @@ const { getDefaultConfig, mergeConfig } = require("@expo/metro-config");
  */
 const config = getDefaultConfig(__dirname);
 const modulesToEnableExports = ["@privy-io/expo", "@privy-io/expo/passkey"];
+
+// config.transformer = {
+//   ...config.transformer,
+//   babelTransformerPath: require.resolve("react-native-svg-transformer"),
+// };
 
 const resolveRequestWithPackageExports = (context, moduleName, platform) => {
   if (modulesToEnableExports.includes(moduleName)) {
@@ -23,4 +29,4 @@ const resolveRequestWithPackageExports = (context, moduleName, platform) => {
 
 config.resolver.resolveRequest = resolveRequestWithPackageExports;
 
-module.exports = config;
+module.exports = withNativeWind(config, { input: "./global.css" });
