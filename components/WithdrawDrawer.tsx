@@ -67,10 +67,10 @@ const Actions = () => {
     <View className="w-full flex-row items-center justify-end py-4">
       <Button
         onPress={() => {
-          router.push("/login");
+          // router.push("/login");
         }}
         isWhite
-        className="h-14 w-[35vw]"
+        className="h-14 w-[35vw] flex-row items-center justify-around pl-1"
       >
         <Text className="font-sans-extrabold text-lg">Deposit</Text>
         <ChevronRight size={24} color="black" />

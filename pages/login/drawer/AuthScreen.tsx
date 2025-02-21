@@ -92,9 +92,6 @@ const SocialLogin = () => {
       }
     },
   });
-  useEffect(() => {
-    console.log("oauth state", state);
-  }, [state]);
   return (
     <View className="w-full px-2 pt-8">
       <Text className="font-sans-semibold text-xl text-white/70 pb-2">

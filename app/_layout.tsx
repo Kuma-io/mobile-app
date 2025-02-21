@@ -6,7 +6,7 @@ import {
   Inter_800ExtraBold,
   Inter_900Black,
 } from "@expo-google-fonts/inter";
-import { PrivyProvider } from "@privy-io/expo";
+import { PrivyProvider, usePrivy } from "@privy-io/expo";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
@@ -15,7 +15,9 @@ import "../global.css";
 import { Toaster } from "sonner-native";
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
-export default function RootLayout() {
+
+function AppContent() {
+  const { isReady } = usePrivy();
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
@@ -26,26 +28,32 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (fontsLoaded || fontError) {
+    if ((fontsLoaded || fontError) && isReady) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, fontError]);
+  }, [fontsLoaded, fontError, isReady]);
 
   if (!fontsLoaded && !fontError) {
     return null;
   }
 
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Stack>
+        <Stack.Screen name="index" />
+      </Stack>
+      <Toaster invert />
+    </GestureHandlerRootView>
+  );
+}
+
+export default function RootLayout() {
+  return (
     <PrivyProvider
       appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID as string}
       clientId={process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID as string}
     >
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <Stack>
-          <Stack.Screen name="index" />
-        </Stack>
-        <Toaster invert />
-      </GestureHandlerRootView>
+      <AppContent />
     </PrivyProvider>
   );
 }

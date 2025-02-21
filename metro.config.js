@@ -8,7 +8,6 @@ const { withNativeWind } = require("nativewind/metro");
  * @type {import('metro-config').MetroConfig}
  */
 const config = getDefaultConfig(__dirname);
-const modulesToEnableExports = ["@privy-io/expo", "@privy-io/expo/passkey"];
 
 // Add support for SVG
 const { transformer, resolver } = config;
@@ -25,7 +24,7 @@ config.resolver = {
 };
 
 const resolveRequestWithPackageExports = (context, moduleName, platform) => {
-  if (modulesToEnableExports.includes(moduleName)) {
+  if (moduleName.startsWith("@privy-io/")) {
     const ctx = {
       ...context,
       unstable_enablePackageExports: true,

@@ -3,7 +3,6 @@
   "compilerOptions": {
     "strict": true,
     "module": "es2015",
-    // Allows us to use conditional/deep imports on published packages
     "moduleResolution": "Bundler",
     "paths": {
       "@/*": [
@@ -15,9 +14,10 @@
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts",
+    "types/expo-env.d.ts",
     "types/nativewind-env.d.ts",
     "app/index.js",
-    "nativewind-env.d.ts"
+    "nativewind-env.d.ts",
+    "expo-env.d.ts"
   ]
 }

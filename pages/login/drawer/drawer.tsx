@@ -61,7 +61,6 @@ export default function LoginDrawer({
   }, [isVisible]);
 
   useEffect(() => {
-    console.log("state", state);
     if (state.status === "awaiting-code-input") {
       setIsOtpStep(true);
     }
