@@ -33,7 +33,12 @@ export default function Actions() {
       <Button
         onPress={async () => {
           await logout();
-          // router.replace('/login');
+          router.replace({
+            pathname: "/",
+            params: {
+              animation: "none",
+            },
+          });
         }}
         className="h-16 w-[35vw] bg-red-500/90 pl-1"
       >

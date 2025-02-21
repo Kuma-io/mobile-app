@@ -5,10 +5,9 @@ import { formatYield } from "@/utils/formatYield";
 
 export default function Stats() {
   const {
-    data: { balance, principal },
+    data: { balance, principal, yield: yieldValue },
   } = useStore();
-  const latestProfit = balance - principal;
-  const annualYield = (latestProfit / principal) * 100;
+  const annualYield = (balance / principal) * 100;
   return (
     <View className="w-full flex-col items-start justify-between gap-2 px-8">
       <Text className="font-sans-bold text-lg text-gray-400">Statistics</Text>
@@ -28,16 +27,16 @@ export default function Stats() {
           <View className="w-full flex-row items-center justify-between gap-2">
             <Text className="font-sans-bold text-3xl">
               {(() => {
-                const value = formatYield(latestProfit);
+                const value = formatYield(yieldValue);
                 if (value.includes("e")) {
                   const [base, exponent] = value.split("e");
                   return (
                     <>
-                      {`${base}$`}
+                      {`${base}`}
                       <Text className="font-sans-thin text-lg">
-                        {" "}
-                        e{exponent}
+                        e{exponent}{" "}
                       </Text>
+                      {`$`}
                     </>
                   );
                 }

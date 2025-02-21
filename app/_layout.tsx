@@ -7,6 +7,7 @@ import {
   Inter_900Black,
 } from "@expo-google-fonts/inter";
 import { PrivyProvider, usePrivy } from "@privy-io/expo";
+import { SmartWalletsProvider } from "@privy-io/expo/smart-wallets";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
@@ -39,8 +40,9 @@ function AppContent() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <Stack>
+      <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
+        <Stack.Screen name="setting" />
       </Stack>
       <Toaster invert />
     </GestureHandlerRootView>
@@ -53,7 +55,9 @@ export default function RootLayout() {
       appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID as string}
       clientId={process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID as string}
     >
-      <AppContent />
+      <SmartWalletsProvider>
+        <AppContent />
+      </SmartWalletsProvider>
     </PrivyProvider>
   );
 }

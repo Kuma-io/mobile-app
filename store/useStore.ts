@@ -17,6 +17,7 @@ interface ChartData {
   timestamp: number;
   balance: number;
   principal: number;
+  yield: number;
 }
 
 export type CurrencySlug =
@@ -35,28 +36,26 @@ interface StoreState {
     walletAddress: string | null;
     balance: number;
     principal: number;
+    yield: number;
     positionData: ChartData[];
     timeframe: Timeframe;
   };
   // Actions
   updateWalletAddress: (walletAddress: string) => void;
   updateBalance: (balance: number) => void;
-  updatePrincipal: (principal: number) => void;
+  updateTimeframe: (timeframe: Timeframe) => void;
   fetchPositionData: () => Promise<void>;
-  fetchingLoading: boolean;
-  error: string | null;
 
   // Settings
   settings: {
     currencySlug: CurrencySlug;
-    timeframe: Timeframe;
   };
   updateSettings: (settings: Partial<StoreState["settings"]>) => void;
 }
 
 const DEFAULT_SETTINGS = {
   currencySlug: "USD" as CurrencySlug,
-  timeframe: "D" as Timeframe,
+  timeframe: "H" as Timeframe,
 };
 
 const useStore = create<StoreState>()(
@@ -67,8 +66,9 @@ const useStore = create<StoreState>()(
         walletAddress: null,
         balance: 0,
         principal: 0,
+        yield: 0,
         positionData: [],
-        timeframe: "D" as Timeframe,
+        timeframe: "H" as Timeframe,
       },
       updateWalletAddress: (walletAddress: string) =>
         set((state) => ({
@@ -84,28 +84,23 @@ const useStore = create<StoreState>()(
             balance,
           },
         })),
-      updatePrincipal: (principal: number) =>
+      updateTimeframe: (timeframe: Timeframe) =>
         set((state) => ({
           data: {
             ...state.data,
-            principal,
+            timeframe,
           },
         })),
-      fetchingLoading: false,
-      error: null,
       fetchPositionData: async () => {
-        const { walletAddress } = get().data;
-        const { timeframe } = get().settings;
+        const { walletAddress, timeframe } = get().data;
 
         if (!walletAddress) {
           console.error("No wallet address available");
           return;
         }
 
-        set({ fetchingLoading: true, error: null });
         try {
-          // Handle case where the history returns 0 because not created yet
-          const apiUrl = `https://kuma-server.vercel.app/positions/${walletAddress}/${timeframe}`;
+          const apiUrl = `https://kuma-server.vercel.app/positions/${walletAddress}/${timeframe}/2`;
           console.log("Fetching from:", apiUrl);
           const response = await fetch(apiUrl);
           const json: ApiResponse = await response.json();
@@ -116,6 +111,9 @@ const useStore = create<StoreState>()(
               timestamp: item.blockNumber * 12000,
               balance: Number(parseFloat(item.userBalance).toFixed(6)),
               principal: Number(parseFloat(item.userPrincipal).toFixed(6)),
+              yield:
+                Number(parseFloat(item.userBalance).toFixed(6)) -
+                Number(parseFloat(item.userPrincipal).toFixed(6)),
             }))
             .reverse();
 
@@ -125,12 +123,13 @@ const useStore = create<StoreState>()(
               positionData: chartData,
               balance: chartData[chartData.length - 1]?.balance || 0,
               principal: chartData[chartData.length - 1]?.principal || 0,
+              yield:
+                chartData[chartData.length - 1]?.balance -
+                  chartData[chartData.length - 1]?.principal || 0,
             },
-            fetchingLoading: false,
           }));
         } catch (error) {
           console.error("Fetch error:", error);
-          set({ error: (error as Error).message, fetchingLoading: false });
         }
       },
 

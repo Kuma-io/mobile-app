@@ -4,6 +4,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { LineChart } from "react-native-wagmi-charts";
 import useStore, { Timeframe } from "@/store/useStore";
 import { triggerHaptic } from "@/utils/haptics";
+import { formatYield } from "@/utils/formatYield";
 
 interface TimeFrameSelectorProps {
   timeFrame: string;
@@ -20,15 +21,16 @@ const timeframeMap: { [key: string]: string } = {
 
 export default function Chart() {
   const {
-    data: { positionData },
-    fetchingLoading,
+    data: { positionData, timeframe, balance },
     fetchPositionData,
-    settings,
-    updateSettings,
+    updateTimeframe,
+    updateBalance,
   } = useStore();
 
+  const [originalBalance, setOriginalBalance] = useState(balance);
+
   // Get the UI timeframe from API timeframe
-  const getUITimeframe = (apiTimeframe: string) => {
+  const getUITimeframe = (apiTimeframe: Timeframe) => {
     return (
       Object.entries(timeframeMap).find(
         ([_, value]) => value === apiTimeframe
@@ -36,7 +38,7 @@ export default function Chart() {
     );
   };
 
-  const timeFrame = getUITimeframe(settings.timeframe);
+  const timeFrame = getUITimeframe(timeframe);
 
   // Transform the data to match the LineChart expected format
   const chartData = positionData.map((item) => ({
@@ -46,7 +48,8 @@ export default function Chart() {
 
   const handleTimeFrameChange = (newTimeFrame: string) => {
     const apiTimeframe = timeframeMap[newTimeFrame];
-    updateSettings({ timeframe: apiTimeframe as Timeframe });
+    updateTimeframe(apiTimeframe as Timeframe);
+    console.log("[FETCHING FOR CHART PAGE]");
     fetchPositionData();
   };
 
@@ -72,11 +75,14 @@ export default function Chart() {
       />
       <LineChart.Provider
         data={chartData}
-        onCurrentIndexChange={() => {
+        onCurrentIndexChange={(index) => {
           triggerHaptic("light");
+          if (index !== undefined && index >= 0 && index < chartData.length) {
+            updateBalance(chartData[index].value);
+          }
         }}
       >
-        <LineChart width={375} height={200} className="">
+        <LineChart width={375} height={200}>
           <LineChart.Path color="black">
             <LineChart.Dot color="black" at={chartData.length - 1} hasPulse />
           </LineChart.Path>
@@ -84,12 +90,15 @@ export default function Chart() {
             color="black"
             onActivated={() => {
               triggerHaptic("light");
+              setOriginalBalance(balance);
             }}
             onEnded={() => {
               triggerHaptic("light");
+              updateBalance(originalBalance);
             }}
-          />
-          <LineChart.Tooltip cursorGutter={60} xGutter={16} yGutter={16} />
+          >
+            {/* <LineChart.Tooltip cursorGutter={60} xGutter={16} yGutter={0} /> */}
+          </LineChart.CursorCrosshair>
         </LineChart>
       </LineChart.Provider>
     </View>

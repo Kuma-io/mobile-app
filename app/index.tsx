@@ -6,6 +6,6 @@ import LoginScreen from "@/components/LoginScreen";
 
 export default function Index() {
   const { user } = usePrivy();
-  // return user ? <Homepage /> : <LoginPage />;
-  return user ? <UserScreen /> : <LoginScreen />;
+  return user ? <Homepage /> : <LoginPage />;
+  // return user ? <UserScreen /> : <LoginScreen />;
 }
