@@ -1,5 +1,5 @@
 import * as haptics from "expo-haptics";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { LineChart } from "react-native-wagmi-charts";
 import useStore, { Timeframe } from "@/store/useStore";
@@ -28,6 +28,24 @@ export default function Chart() {
   } = useStore();
 
   const [originalBalance, setOriginalBalance] = useState(balance);
+  const [chartData, setChartData] = useState<
+    {
+      timestamp: number;
+      value: number;
+    }[]
+  >([]);
+
+  const chartDataRef = useRef(chartData);
+
+  useEffect(() => {
+    const chartData = positionData.map((item) => ({
+      timestamp: item.timestamp,
+      value: item.value,
+    }));
+    console.log("updating chartData", chartData);
+    setChartData(chartData);
+    chartDataRef.current = chartData;
+  }, [positionData]);
 
   // Get the UI timeframe from API timeframe
   const getUITimeframe = (apiTimeframe: Timeframe) => {
@@ -39,12 +57,6 @@ export default function Chart() {
   };
 
   const timeFrame = getUITimeframe(timeframe);
-
-  // Transform the data to match the LineChart expected format
-  const chartData = positionData.map((item) => ({
-    timestamp: item.timestamp,
-    value: item.balance,
-  }));
 
   const handleTimeFrameChange = (newTimeFrame: string) => {
     const apiTimeframe = timeframeMap[newTimeFrame];
@@ -77,9 +89,7 @@ export default function Chart() {
         data={chartData}
         onCurrentIndexChange={(index) => {
           triggerHaptic("light");
-          if (index !== undefined && index >= 0 && index < chartData.length) {
-            updateBalance(chartData[index].value);
-          }
+          updateBalance(chartDataRef.current[index].value);
         }}
       >
         <LineChart width={375} height={200}>
@@ -97,7 +107,7 @@ export default function Chart() {
               updateBalance(originalBalance);
             }}
           >
-            {/* <LineChart.Tooltip cursorGutter={60} xGutter={16} yGutter={0} /> */}
+            <LineChart.Tooltip cursorGutter={60} xGutter={16} yGutter={0} />
           </LineChart.CursorCrosshair>
         </LineChart>
       </LineChart.Provider>

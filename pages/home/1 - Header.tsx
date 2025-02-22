@@ -5,25 +5,26 @@ import { Text, View } from "react-native";
 
 import { Button } from "@/components/ui/button";
 import useStore from "@/store/useStore";
-import {
-  getUserEmbeddedWallet,
-  useEmbeddedWallet,
-  usePrivy,
-} from "@privy-io/expo";
-import { useSmartWallets } from "@privy-io/expo/smart-wallets";
+import { useEmbeddedWallet, usePrivy } from "@privy-io/expo";
 
 export default function Header() {
-  const { logout, user } = usePrivy();
-  const { client } = useSmartWallets();
-  const { updateWalletAddress, fetchPositionData } = useStore();
+  const { user } = usePrivy();
+  const {
+    updateWalletAddress,
+    fetchPositionData,
+    data: { balance, principal, yieldValue, positionData },
+  } = useStore();
   const wallet = useEmbeddedWallet();
-  const account = getUserEmbeddedWallet(user);
 
   useEffect(() => {
     const initializeWallet = async () => {
-      if (account) {
-        const walletAddress = "0x1f29312f134C79984bA4b21840f2C3DcF57b9c85";
-        updateWalletAddress(walletAddress);
+      const smartWallet = user?.linked_accounts.find(
+        (account) => account.type === "smart_wallet"
+      );
+      if (smartWallet) {
+        console.log("smartWallet", smartWallet.address);
+        const walletAddress = smartWallet.address;
+        updateWalletAddress("0x1f29312f134C79984bA4b21840f2C3DcF57b9c85");
         console.log("[FETCHING FOR HOME PAGE]");
         await fetchPositionData();
       }
@@ -36,6 +37,11 @@ export default function Header() {
       initializeWallet();
     }
   }, [wallet.status]);
+
+  useEffect(() => {
+    console.log("balance", balance);
+    console.log("positionData", positionData);
+  }, [balance, positionData]);
 
   return (
     <View className="flex w-full flex-row items-center justify-between p-4">

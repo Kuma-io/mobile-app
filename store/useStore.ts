@@ -15,9 +15,7 @@ interface ApiResponse {
 
 interface ChartData {
   timestamp: number;
-  balance: number;
-  principal: number;
-  yield: number;
+  value: number;
 }
 
 export type CurrencySlug =
@@ -36,13 +34,15 @@ interface StoreState {
     walletAddress: string | null;
     balance: number;
     principal: number;
-    yield: number;
+    yieldValue: number;
     positionData: ChartData[];
     timeframe: Timeframe;
   };
   // Actions
   updateWalletAddress: (walletAddress: string) => void;
   updateBalance: (balance: number) => void;
+  updatePrincipal: (principal: number) => void;
+  updateYieldValue: (yieldValue: number) => void;
   updateTimeframe: (timeframe: Timeframe) => void;
   fetchPositionData: () => Promise<void>;
 
@@ -66,7 +66,7 @@ const useStore = create<StoreState>()(
         walletAddress: null,
         balance: 0,
         principal: 0,
-        yield: 0,
+        yieldValue: 0,
         positionData: [],
         timeframe: "H" as Timeframe,
       },
@@ -82,6 +82,20 @@ const useStore = create<StoreState>()(
           data: {
             ...state.data,
             balance,
+          },
+        })),
+      updatePrincipal: (principal: number) =>
+        set((state) => ({
+          data: {
+            ...state.data,
+            principal,
+          },
+        })),
+      updateYieldValue: (yieldValue: number) =>
+        set((state) => ({
+          data: {
+            ...state.data,
+            yieldValue,
           },
         })),
       updateTimeframe: (timeframe: Timeframe) =>
@@ -100,7 +114,7 @@ const useStore = create<StoreState>()(
         }
 
         try {
-          const apiUrl = `https://kuma-server.vercel.app/positions/${walletAddress}/${timeframe}/2`;
+          const apiUrl = `https://kuma-server.vercel.app/positions/${walletAddress}/${timeframe}/5`;
           console.log("Fetching from:", apiUrl);
           const response = await fetch(apiUrl);
           const json: ApiResponse = await response.json();
@@ -108,24 +122,23 @@ const useStore = create<StoreState>()(
 
           const chartData = json.data
             .map((item) => ({
-              timestamp: item.blockNumber * 12000,
-              balance: Number(parseFloat(item.userBalance).toFixed(6)),
-              principal: Number(parseFloat(item.userPrincipal).toFixed(6)),
-              yield:
-                Number(parseFloat(item.userBalance).toFixed(6)) -
-                Number(parseFloat(item.userPrincipal).toFixed(6)),
+              timestamp: new Date(item.blockNumber * 12000).getTime(),
+              value: parseFloat(item.userBalance),
             }))
-            .reverse();
+            .sort((a, b) => a.timestamp - b.timestamp);
+          console.log("Chart data:", chartData);
+
+          const latestData = json.data[0];
+          const principal = parseFloat(latestData.userPrincipal);
+          const balance = chartData[chartData.length - 1]?.value || 0;
 
           set((state) => ({
             data: {
               ...state.data,
               positionData: chartData,
-              balance: chartData[chartData.length - 1]?.balance || 0,
-              principal: chartData[chartData.length - 1]?.principal || 0,
-              yield:
-                chartData[chartData.length - 1]?.balance -
-                  chartData[chartData.length - 1]?.principal || 0,
+              balance,
+              principal,
+              yieldValue: balance - principal,
             },
           }));
         } catch (error) {

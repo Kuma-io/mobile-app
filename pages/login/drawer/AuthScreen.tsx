@@ -103,7 +103,7 @@ const SocialLogin = () => {
             provider: "google",
           });
         }}
-        className="w-full border-2 flex-row items-center justify-between bg-white/10 p-4 rounded-[20px]"
+        className="w-full flex-row items-center justify-between bg-white/10 p-4 rounded-[20px]"
       >
         <View className="flex-row items-center justify-center gap-3">
           <View className="w-10 h-10 bg-white rounded-full items-center justify-center border-2 border-white">
@@ -121,13 +121,13 @@ const SocialLogin = () => {
             provider: "google",
           });
         }}
-        className="w-full border-2 flex-row items-center justify-between bg-white/10 p-4 rounded-[20px]"
+        className="w-full flex-row items-center justify-between bg-white/10 p-4 rounded-[20px] mt-1"
       >
         <View className="flex-row items-center justify-center gap-3">
           <View className="w-10 h-10  rounded-full items-center justify-center pb-[2px]">
             <AppleSvg width={28} height={28} />
           </View>
-          <Text className="font-sans-semibold text-lg text-white pl">
+          <Text className="font-sans-semibold text-lg text-white">
             Sign in with Apple
           </Text>
         </View>

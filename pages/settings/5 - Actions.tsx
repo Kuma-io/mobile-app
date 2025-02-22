@@ -40,7 +40,7 @@ export default function Actions() {
             },
           });
         }}
-        className="h-16 w-[35vw] bg-red-500/90 pl-1"
+        className="h-16 w-[35vw] flex-row items-center justify-around bg-red-500/90 pl-1"
       >
         <Text className="flex-row items-center justify-around font-sans-extrabold text-lg text-white">
           Log Out

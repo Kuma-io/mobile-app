@@ -5,9 +5,9 @@ import { formatYield } from "@/utils/formatYield";
 
 export default function Stats() {
   const {
-    data: { balance, principal, yield: yieldValue },
+    data: { balance, principal, yieldValue },
   } = useStore();
-  const annualYield = (balance / principal) * 100;
+  const annualYield = (yieldValue / principal) * 100;
   return (
     <View className="w-full flex-col items-start justify-between gap-2 px-8">
       <Text className="font-sans-bold text-lg text-gray-400">Statistics</Text>
@@ -23,8 +23,11 @@ export default function Stats() {
             Annual Yield
           </Text>
         </View>
-        <View className="h-24 flex-1 items-start justify-around rounded-2xl bg-black/5 p-4">
-          <View className="w-full flex-row items-center justify-between gap-2">
+        <View className="h-24 flex-1 items-start justify-around rounded-2xl bg-black/5 p-4 pt-3">
+          <Text className="font-sans-medium text-sm text-gray-500">
+            Profit Made
+          </Text>
+          <View className="w-full flex-row items-center justify-between gap-2 mt-2">
             <Text className="font-sans-bold text-3xl">
               {(() => {
                 const value = formatYield(yieldValue);
@@ -43,12 +46,23 @@ export default function Stats() {
                 return `${value}$`;
               })()}
             </Text>
-            <Text className="mt-1 font-sans-bold text-sm text-green-400/80">
-              ▲ {annualYield.toFixed(2)}%
-            </Text>
           </View>
-          <Text className="font-sans-medium text-sm text-gray-500">
-            Profit Made
+          <Text className="mt-1 font-sans-semibold text-green-500 ">
+            ▲{" "}
+            {(() => {
+              const value = formatYield(annualYield);
+              if (value.includes("e")) {
+                const [base, exponent] = value.split("e");
+                return (
+                  <>
+                    {`${base}`}
+                    <Text className="font-sans-thin text-sm">e{exponent} </Text>
+                    {`%`}
+                  </>
+                );
+              }
+              return `${value}$`;
+            })()}
           </Text>
         </View>
       </View>
