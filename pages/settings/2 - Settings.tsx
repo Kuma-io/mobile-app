@@ -7,7 +7,7 @@ import AppleSvg from "@/assets/svg/apple.svg";
 import GoogleSvg from "@/assets/svg/google.svg";
 import useStore from "@/store/useStore";
 import { useSmartWallets } from "@privy-io/expo/smart-wallets";
-
+import { deposit } from "@/utils/deposit";
 export default function Settings() {
   const { logout, user } = usePrivy();
   const {
@@ -16,6 +16,9 @@ export default function Settings() {
     data: { walletAddress },
   } = useStore();
   const { client } = useSmartWallets();
+  const smartWallet = user?.linked_accounts.find(
+    (account) => account.type === "smart_wallet"
+  );
   return (
     <View className="w-full flex-1  px-4">
       <View className="w-full gap-2 rounded-xl bg-white p-4">
@@ -55,6 +58,16 @@ export default function Settings() {
         <ChevronRight size={24} color="black" />
       </Button>
       <Text>{walletAddress}</Text>
+      <Text>{smartWallet?.address}</Text>
+      <Button
+        onPress={() => {
+          deposit(client!, 100).then((receipt) => {
+            console.log(receipt);
+          });
+        }}
+      >
+        <Text>Deposit</Text>
+      </Button>
       {/* <Text>{JSON.stringify(client)}</Text> */}
     </View>
   );

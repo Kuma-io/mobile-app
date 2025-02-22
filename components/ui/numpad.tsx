@@ -30,6 +30,8 @@ export function NumPad(props: NumPadProps) {
     null
   );
 
+  const [isInDecimalMode, setIsInDecimalMode] = useState(false);
+
   const handleNumberPress = (digit: number) => {
     setPressedButton(digit);
     setTimeout(() => setPressedButton(null), 200);
@@ -42,9 +44,18 @@ export function NumPad(props: NumPadProps) {
         }
       );
     } else {
-      (props.setNumber as React.Dispatch<React.SetStateAction<number | null>>)(
+      (props.setNumber as React.Dispatch<React.SetStateAction<number>>)(
         (prev) => {
           if (prev === null) return digit;
+          // If we're in decimal mode, add digits after decimal
+          if (isInDecimalMode) {
+            const decimalPlaces = (prev.toString().split(".")[1] || "").length;
+            if (decimalPlaces >= 2) return prev; // Max 2 decimal places
+            return Number(
+              (prev + digit / Math.pow(10, decimalPlaces + 1)).toFixed(2)
+            );
+          }
+          // Regular integer mode
           const newValue = prev * 10 + digit;
           return newValue > (props.maxValue ?? 999999.99) ? prev : newValue;
         }
@@ -53,9 +64,21 @@ export function NumPad(props: NumPadProps) {
   };
 
   const handleDecimalPress = () => {
+    if (!props.allowDecimals) return;
     setPressedButton(".");
     setTimeout(() => setPressedButton(null), 200);
-    // Implementation for decimal functionality can be added here
+
+    if (!props.isOtpMode) {
+      setIsInDecimalMode(true);
+      (props.setNumber as React.Dispatch<React.SetStateAction<number>>)(
+        (prev) => {
+          if (prev === null) return 0;
+          // If number already has decimals, don't add another decimal point
+          if (prev.toString().includes(".")) return prev;
+          return prev;
+        }
+      );
+    }
   };
 
   const handleDeletePress = () => {
@@ -67,11 +90,27 @@ export function NumPad(props: NumPadProps) {
         (prev) => prev.slice(0, -1)
       );
     } else {
-      (props.setNumber as React.Dispatch<React.SetStateAction<number | null>>)(
+      (props.setNumber as React.Dispatch<React.SetStateAction<number>>)(
         (prev) => {
-          if (prev === null) return null;
+          if (prev === null || prev === 0) {
+            setIsInDecimalMode(false);
+            return 0;
+          }
+          const strNum = prev.toString();
+          // If we're deleting a decimal number
+          if (strNum.includes(".")) {
+            const [wholePart, decimalPart] = strNum.split(".");
+            // If there's only one decimal digit left
+            if (decimalPart.length === 1) {
+              setIsInDecimalMode(false);
+              return Number(wholePart);
+            }
+            // Remove last decimal digit
+            return Number(strNum.slice(0, -1));
+          }
+          // Regular integer deletion
           const newValue = Math.floor(prev / 10);
-          return newValue === 0 ? null : newValue;
+          return newValue;
         }
       );
     }

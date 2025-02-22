@@ -107,7 +107,7 @@ export default function Chart() {
               updateBalance(originalBalance);
             }}
           >
-            <LineChart.Tooltip cursorGutter={60} xGutter={16} yGutter={0} />
+            {/* <LineChart.Tooltip cursorGutter={60} xGutter={16} yGutter={0} /> */}
           </LineChart.CursorCrosshair>
         </LineChart>
       </LineChart.Provider>

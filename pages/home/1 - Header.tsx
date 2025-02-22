@@ -30,7 +30,6 @@ export default function Header() {
       }
     };
 
-    console.log("wallet.status", wallet.status);
     if (wallet.status === "not-created") {
       wallet.create();
     } else if (wallet.status === "connected") {

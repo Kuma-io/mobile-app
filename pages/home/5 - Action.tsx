@@ -3,12 +3,14 @@ import React, { useState } from "react";
 import { Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import WithdrawDrawer from "@/components/WithdrawDrawer";
 import { Button } from "@/components/ui/button";
+import DepositDrawer from "./drawer/deposit";
+import WithdrawDrawer from "./drawer/withdraw";
 
 export default function ActionPage() {
   const insets = useSafeAreaInsets();
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isWithdrawModalVisible, setIsWithdrawModalVisible] = useState(false);
+  const [isDepositModalVisible, setIsDepositModalVisible] = useState(false);
   return (
     <>
       <View
@@ -23,29 +25,35 @@ export default function ActionPage() {
         className="w-full flex-row items-center justify-around px-4 pb-4"
       >
         <Button
-          onPress={() => {}}
-          className="flex-row items-center justify-around h-16 w-[40vw] pl-1"
-        >
-          <Text className="font-sans-extrabold text-lg text-white">
-            Deposit
-          </Text>
-          <ChevronRight size={24} color="white" />
-        </Button>
-        <Button
           onPress={() => {
-            setIsModalVisible(true);
+            setIsWithdrawModalVisible(true);
           }}
-          className="flex-row items-center justify-around h-16 w-[40vw] pl-2"
+          className="flex-row items-center justify-around h-16 w-[40vw] pl-1"
         >
           <Text className="font-sans-extrabold text-lg text-white">
             Withdraw
           </Text>
           <ChevronRight size={24} color="white" />
         </Button>
+        <Button
+          onPress={() => {
+            setIsDepositModalVisible(true);
+          }}
+          className="flex-row items-center justify-around h-16 w-[40vw] pl-2"
+        >
+          <Text className="font-sans-extrabold text-lg text-white">
+            Deposit
+          </Text>
+          <ChevronRight size={24} color="white" />
+        </Button>
       </View>
       <WithdrawDrawer
-        isVisible={isModalVisible}
-        onClose={() => setIsModalVisible(false)}
+        isVisible={isWithdrawModalVisible}
+        onClose={() => setIsWithdrawModalVisible(false)}
+      />
+      <DepositDrawer
+        isVisible={isDepositModalVisible}
+        onClose={() => setIsDepositModalVisible(false)}
       />
     </>
   );
