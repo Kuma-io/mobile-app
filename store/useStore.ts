@@ -114,11 +114,10 @@ const useStore = create<StoreState>()(
         }
 
         try {
-          const apiUrl = `https://kuma-server.vercel.app/positions/${walletAddress}/${timeframe}/5`;
+          const apiUrl = `https://kuma-server.vercel.app/positions/${walletAddress}/${timeframe}`;
           console.log("Fetching from:", apiUrl);
           const response = await fetch(apiUrl);
           const json: ApiResponse = await response.json();
-          console.log("Response:", json);
 
           const chartData = json.data
             .map((item) => ({

@@ -42,7 +42,6 @@ export default function Chart() {
       timestamp: item.timestamp,
       value: item.value,
     }));
-    console.log("updating chartData", chartData);
     setChartData(chartData);
     chartDataRef.current = chartData;
   }, [positionData]);
@@ -61,7 +60,6 @@ export default function Chart() {
   const handleTimeFrameChange = (newTimeFrame: string) => {
     const apiTimeframe = timeframeMap[newTimeFrame];
     updateTimeframe(apiTimeframe as Timeframe);
-    console.log("[FETCHING FOR CHART PAGE]");
     fetchPositionData();
   };
 

@@ -22,10 +22,8 @@ export default function Header() {
         (account) => account.type === "smart_wallet"
       );
       if (smartWallet) {
-        console.log("smartWallet", smartWallet.address);
         const walletAddress = smartWallet.address;
         updateWalletAddress("0x1f29312f134C79984bA4b21840f2C3DcF57b9c85");
-        console.log("[FETCHING FOR HOME PAGE]");
         await fetchPositionData();
       }
     };
@@ -36,11 +34,6 @@ export default function Header() {
       initializeWallet();
     }
   }, [wallet.status]);
-
-  useEffect(() => {
-    console.log("balance", balance);
-    console.log("positionData", positionData);
-  }, [balance, positionData]);
 
   return (
     <View className="flex w-full flex-row items-center justify-between p-4">
