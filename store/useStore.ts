@@ -132,6 +132,7 @@ const useStore = create<StoreState>()(
             }))
             .sort((a: ChartData, b: ChartData) => a.timestamp - b.timestamp);
           // Get the latest position data
+          console.log("positionData", positionData);
           const latestData = json.userPositions[0];
           const principal = parseFloat(latestData.userPrincipal);
           const balance = parseFloat(latestData.userBalance);

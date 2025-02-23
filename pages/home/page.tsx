@@ -6,7 +6,7 @@ import Header from "./1 - Header";
 import Balance from "./2 - Balance";
 import Chart from "./3 - Chart";
 import Stats from "./4 - Stats";
-import Activity from "./5 - Activity";
+import Activity from "./5 - Transactions";
 import Action from "./6 - Action";
 export default function Homepage() {
   return (

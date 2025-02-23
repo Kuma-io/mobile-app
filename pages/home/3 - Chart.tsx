@@ -28,7 +28,6 @@ export default function Chart() {
     updateBalance,
   } = useStore();
 
-  const [originalBalance, setOriginalBalance] = useState(balance);
   const [chartData, setChartData] = useState<
     {
       timestamp: number;
@@ -99,11 +98,10 @@ export default function Chart() {
             color="black"
             onActivated={() => {
               triggerHaptic("light");
-              setOriginalBalance(balance);
             }}
             onEnded={() => {
               triggerHaptic("light");
-              updateBalance(originalBalance);
+              updateBalance(chartDataRef.current[chartData.length - 1].value);
             }}
           >
             {/* <LineChart.Tooltip cursorGutter={60} xGutter={16} yGutter={0} /> */}
