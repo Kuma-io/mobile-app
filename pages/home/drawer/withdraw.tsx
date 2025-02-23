@@ -23,7 +23,7 @@ export default function WithdrawDrawer({
   const [number, setNumber] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const { client } = useSmartWallets();
-  const { fetchPositionData } = useStore();
+  const { fetchPositionData, fetchActions } = useStore();
 
   useEffect(() => {
     if (!isVisible) {
@@ -41,6 +41,7 @@ export default function WithdrawDrawer({
           setIsLoading(true);
           const receipt = await withdraw(client, number);
           fetchPositionData();
+          fetchActions();
           triggerHaptic("success");
           onClose();
           return receipt;

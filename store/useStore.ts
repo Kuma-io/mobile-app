@@ -29,7 +29,7 @@ export type CurrencySlug =
   | "AUD"
   | "CAD"
   | "NZD";
-export type Timeframe = "H" | "D" | "W" | "M";
+export type Timeframe = "H" | "D" | "W" | "M" | "Y";
 
 interface StoreState {
   data: {
@@ -119,7 +119,6 @@ const useStore = create<StoreState>()(
 
         try {
           const json = await getUserPositions(walletAddress, timeframe);
-          console.log("json", json);
           if (!json.userPositions || json.userPositions.length === 0) {
             console.log("No position data available");
             return;
@@ -132,7 +131,6 @@ const useStore = create<StoreState>()(
               value: parseFloat(position.userBalance),
             }))
             .sort((a: ChartData, b: ChartData) => a.timestamp - b.timestamp);
-          console.log("Position data:", positionData);
           // Get the latest position data
           const latestData = json.userPositions[0];
           const principal = parseFloat(latestData.userPrincipal);
@@ -160,7 +158,6 @@ const useStore = create<StoreState>()(
 
         try {
           const json = await getUserActions(walletAddress);
-          console.log("json", json);
           if (!json.userActions || json.userActions.length === 0) {
             console.log("No actions available");
             return;

@@ -6,6 +6,10 @@ import { Button } from "@/components/ui/button";
 export default function Activity() {
   const { actions } = useStore((state) => state.data);
 
+  useEffect(() => {
+    console.log("actions", actions);
+  }, [actions]);
+
   const sortedActions = [...actions].sort(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
   );

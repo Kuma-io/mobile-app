@@ -16,6 +16,7 @@ const timeframeMap: { [key: string]: string } = {
   "1H": "H",
   "1D": "D",
   "1W": "W",
+  "1M": "M",
   "1Y": "Y",
 };
 
@@ -117,7 +118,7 @@ function TimeFrameSelector({
   timeFrame,
   onTimeFrameChange,
 }: TimeFrameSelectorProps) {
-  const timeFrames = ["1H", "1D", "1W", "1Y"];
+  const timeFrames = ["1H", "1D", "1W", "1M", "1Y"];
 
   return (
     <View className="mx-auto flex w-[70%] flex-row justify-between">
