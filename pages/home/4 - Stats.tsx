@@ -18,7 +18,7 @@ export default function Stats() {
 const AaveYield = () => {
   return (
     <View className="h-24 flex-1 items-center rounded-2xl bg-black">
-      <View className="items-center flex-1 justify-around p-4 pt-3">
+      <View className="items-start flex-1 justify-around p-4 pt-3 pl-5">
         <Text className="font-sans-medium text-sm text-gray-400">
           Annual Yield
         </Text>
@@ -35,10 +35,10 @@ const Rewards = () => {
   const {
     data: { balance, principal, yieldValue },
   } = useStore();
-  const annualYield = (yieldValue / principal) * 100;
+  const annualYield = principal > 0 ? (yieldValue / principal) * 100 : 0;
   return (
     <View className="h-24 flex-1 items-center justify-center rounded-2xl bg-black">
-      <View className="items-center flex-1 justify-around p-4 pt-3">
+      <View className="items-start flex-1 justify-around p-4 pt-3 pl-5">
         <Text className="font-sans-medium text-sm text-gray-400">
           Profit Made
         </Text>
@@ -58,9 +58,14 @@ const Rewards = () => {
             return `${value}$`;
           })()}
         </Text>
-        <Text className="mt-1 font-sans-semibold text-green-500 ">
-          ▲{" "}
+        <Text
+          className={`mt-1 font-sans-semibold ${
+            principal === 0 ? "text-gray-400" : "text-green-500"
+          }`}
+        >
+          {principal === 0 ? "- " : "▲ "}
           {(() => {
+            if (annualYield === 0) return "0%";
             const value = formatYield(annualYield);
             if (value.includes("e")) {
               const [base, exponent] = value.split("e");

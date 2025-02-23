@@ -6,14 +6,11 @@ import { Text, View } from "react-native";
 import { Button } from "@/components/ui/button";
 import useStore from "@/store/useStore";
 import { useEmbeddedWallet, usePrivy } from "@privy-io/expo";
+import { registerUser } from "@/lib/api";
 
 export default function Header() {
   const { user } = usePrivy();
-  const {
-    updateWalletAddress,
-    fetchPositionData,
-    data: { balance, principal, yieldValue, positionData },
-  } = useStore();
+  const { updateWalletAddress, fetchPositionData, fetchActions } = useStore();
   const wallet = useEmbeddedWallet();
 
   useEffect(() => {
@@ -23,10 +20,22 @@ export default function Header() {
       );
       if (smartWallet) {
         const walletAddress = smartWallet.address;
-        // updateWalletAddress("0x1f29312f134C79984bA4b21840f2C3DcF57b9c85");
+        const emailAccount = user?.linked_accounts.find(
+          (account) =>
+            account.type === "google_oauth" ||
+            account.type === "email" ||
+            account.type === "apple_oauth"
+        );
+        const email =
+          emailAccount && "email" in emailAccount
+            ? emailAccount.email
+            : undefined;
         updateWalletAddress(walletAddress);
-        console.log("smartWallet", walletAddress);
+        if (email) {
+          await registerUser(walletAddress, email);
+        }
         await fetchPositionData();
+        await fetchActions();
       }
     };
 

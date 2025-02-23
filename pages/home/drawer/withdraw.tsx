@@ -24,6 +24,13 @@ export default function WithdrawDrawer({
   const [isLoading, setIsLoading] = useState(false);
   const { client } = useSmartWallets();
   const { fetchPositionData } = useStore();
+
+  useEffect(() => {
+    if (!isVisible) {
+      setNumber(0);
+    }
+  }, [isVisible]);
+
   const handleWithdraw = async (): Promise<any> => {
     triggerHaptic("heavy");
     if (!client || number <= 0) return;
@@ -39,6 +46,7 @@ export default function WithdrawDrawer({
           return receipt;
         } catch (error) {
           triggerHaptic("error");
+          console.log(error);
           throw error;
         } finally {
           setIsLoading(false);

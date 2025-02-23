@@ -1,16 +1,18 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getUserActions, getUserPositions } from "@/lib/api";
 
-interface PositionData {
-  blockNumber: number;
+interface UserPosition {
+  timestamp: string;
   userBalance: string;
   userPrincipal: string;
 }
 
-interface ApiResponse {
-  status: string;
-  data: PositionData[];
+interface Action {
+  timestamp: string;
+  action: string;
+  amount: string;
 }
 
 interface ChartData {
@@ -36,6 +38,7 @@ interface StoreState {
     principal: number;
     yieldValue: number;
     positionData: ChartData[];
+    actions: Action[];
     timeframe: Timeframe;
   };
   // Actions
@@ -45,7 +48,7 @@ interface StoreState {
   updateYieldValue: (yieldValue: number) => void;
   updateTimeframe: (timeframe: Timeframe) => void;
   fetchPositionData: () => Promise<void>;
-
+  fetchActions: () => Promise<void>;
   // Settings
   settings: {
     currencySlug: CurrencySlug;
@@ -68,6 +71,7 @@ const useStore = create<StoreState>()(
         principal: 0,
         yieldValue: 0,
         positionData: [],
+        actions: [],
         timeframe: "H" as Timeframe,
       },
       updateWalletAddress: (walletAddress: string) =>
@@ -114,34 +118,68 @@ const useStore = create<StoreState>()(
         }
 
         try {
-          const apiUrl = `https://kuma-server.vercel.app/positions/${walletAddress}/${timeframe}`;
-          console.log("Fetching from:", apiUrl);
-          const response = await fetch(apiUrl);
-          const json: ApiResponse = await response.json();
+          const json = await getUserPositions(walletAddress, timeframe);
+          console.log("json", json);
+          if (!json.userPositions || json.userPositions.length === 0) {
+            console.log("No position data available");
+            return;
+          }
 
-          const chartData = json.data
-            .map((item) => ({
-              timestamp: new Date(item.blockNumber * 12000).getTime(),
-              value: parseFloat(item.userBalance),
+          // Transform API data into ChartData format
+          const positionData: ChartData[] = json.userPositions
+            .map((position: UserPosition) => ({
+              timestamp: new Date(position.timestamp).getTime(),
+              value: parseFloat(position.userBalance),
             }))
-            .sort((a, b) => a.timestamp - b.timestamp);
-          console.log("Chart data:", chartData);
-
-          const latestData = json.data[0];
+            .sort((a: ChartData, b: ChartData) => a.timestamp - b.timestamp);
+          console.log("Position data:", positionData);
+          // Get the latest position data
+          const latestData = json.userPositions[0];
           const principal = parseFloat(latestData.userPrincipal);
-          const balance = chartData[chartData.length - 1]?.value || 0;
+          const balance = parseFloat(latestData.userBalance);
 
           set((state) => ({
             data: {
               ...state.data,
-              positionData: chartData,
               balance,
               principal,
               yieldValue: balance - principal,
+              positionData,
             },
           }));
         } catch (error) {
           console.error("Fetch error:", error);
+        }
+      },
+      fetchActions: async () => {
+        const { walletAddress } = get().data;
+        if (!walletAddress) {
+          console.error("No wallet address available");
+          return;
+        }
+
+        try {
+          const json = await getUserActions(walletAddress);
+          console.log("json", json);
+          if (!json.userActions || json.userActions.length === 0) {
+            console.log("No actions available");
+            return;
+          }
+
+          const actions: Action[] = json.userActions.map((action: any) => ({
+            timestamp: action.timestamp,
+            action: action.action,
+            amount: action.amount,
+          }));
+
+          set((state) => ({
+            data: {
+              ...state.data,
+              actions,
+            },
+          }));
+        } catch (error) {
+          console.error("Error fetching actions:", error);
         }
       },
 

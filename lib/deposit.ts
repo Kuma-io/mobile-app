@@ -2,6 +2,11 @@ import { publicClient } from "../utils/publicClient";
 import { FACTORY_ADDRESS, FACTORY_ABI, USDC_ADDRESS } from "../utils/contract";
 import type { SmartWalletClientType } from "@privy-io/js-sdk-core/smart-wallets";
 import { parseUnits, erc20Abi } from "viem";
+import { registerUserActions, registerUserPosition } from "./api";
+
+const serverUrl = process.env.SERVER_URL;
+const serverApiKey = process.env.SERVER_API_KEY;
+
 export const deposit = async (
   client: SmartWalletClientType,
   amount: number
@@ -28,5 +33,13 @@ export const deposit = async (
   const receipt = await publicClient.waitForTransactionReceipt({
     hash: txHash,
   });
-  return receipt;
+
+  // Check if the transaction was successful
+  if (receipt.status === "success") {
+    registerUserActions(client.account.address, "DEPOSIT", amount);
+    await registerUserPosition(client.account.address);
+    return receipt;
+  } else {
+    throw new Error("Transaction failed on the blockchain");
+  }
 };

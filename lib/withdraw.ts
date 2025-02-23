@@ -2,6 +2,9 @@ import { publicClient } from "../utils/publicClient";
 import { FACTORY_ADDRESS, FACTORY_ABI } from "../utils/contract";
 import type { SmartWalletClientType } from "@privy-io/js-sdk-core/smart-wallets";
 import { parseUnits } from "viem";
+import { registerUserActions, registerUserPosition } from "./api";
+const serverUrl = process.env.SERVER_URL;
+const serverApiKey = process.env.SERVER_API_KEY;
 
 export const withdraw = async (
   client: SmartWalletClientType,
@@ -22,5 +25,11 @@ export const withdraw = async (
   const receipt = await publicClient.waitForTransactionReceipt({
     hash: txHash,
   });
-  return receipt;
+  if (receipt.status === "success") {
+    registerUserActions(client.account.address, "WITHDRAW", amount);
+    await registerUserPosition(client.account.address);
+    return receipt;
+  } else {
+    throw new Error("Transaction failed on the blockchain");
+  }
 };

@@ -1,12 +1,14 @@
 import { Text, View } from "react-native";
+import React from "react";
 import useStore from "@/store/useStore";
 import { parseUnits } from "viem";
+import { formatYield } from "@/utils/formatYield";
 
 export default function Balance() {
   const {
     data: { balance, principal, yieldValue },
   } = useStore();
-  const annualYield = (yieldValue / principal) * 100;
+  const annualYield = principal > 0 ? (yieldValue / principal) * 100 : 0;
 
   return (
     <View className="w-full items-start justify-center px-8 pb-4">
@@ -14,8 +16,27 @@ export default function Balance() {
       <Text className="font-sans-extrabold text-4xl tracking-[0.05em]">
         {`${balance}$`}
       </Text>
-      <Text className="font-sans-bold text-sm text-green-500">
-        ▲{`${annualYield}%`}
+      <Text
+        className={`font-sans-bold text-sm ${
+          principal === 0 ? "text-gray-400" : "text-green-500"
+        }`}
+      >
+        {principal === 0 ? "- " : "▲ "}
+        {(() => {
+          if (principal === 0) return "0%";
+          const value = formatYield(annualYield);
+          if (value.includes("e")) {
+            const [base, exponent] = value.split("e");
+            return (
+              <>
+                {`${base}`}
+                <Text className="font-sans-thin text-sm">e{exponent} </Text>
+                {`%`}
+              </>
+            );
+          }
+          return `${value}%`;
+        })()}
       </Text>
     </View>
   );
