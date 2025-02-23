@@ -1,10 +1,12 @@
 import { Text, View } from "react-native";
 import useStore from "@/store/useStore";
+import { parseUnits } from "viem";
 
 export default function Balance() {
   const {
-    data: { balance },
+    data: { balance, principal, yieldValue },
   } = useStore();
+  const annualYield = (yieldValue / principal) * 100;
 
   return (
     <View className="w-full items-start justify-center px-8 pb-4">
@@ -12,7 +14,9 @@ export default function Balance() {
       <Text className="font-sans-extrabold text-4xl tracking-[0.05em]">
         {`${balance}$`}
       </Text>
-      <Text className="font-sans-bold text-sm text-green-400/80">▲ 12.45%</Text>
+      <Text className="font-sans-bold text-sm text-green-500">
+        ▲{`${annualYield}%`}
+      </Text>
     </View>
   );
 }

@@ -23,7 +23,9 @@ export default function Header() {
       );
       if (smartWallet) {
         const walletAddress = smartWallet.address;
-        updateWalletAddress("0x1f29312f134C79984bA4b21840f2C3DcF57b9c85");
+        // updateWalletAddress("0x1f29312f134C79984bA4b21840f2C3DcF57b9c85");
+        updateWalletAddress(walletAddress);
+        console.log("smartWallet", walletAddress);
         await fetchPositionData();
       }
     };

@@ -7,7 +7,7 @@ import AppleSvg from "@/assets/svg/apple.svg";
 import GoogleSvg from "@/assets/svg/google.svg";
 import useStore from "@/store/useStore";
 import { useSmartWallets } from "@privy-io/expo/smart-wallets";
-import { deposit } from "@/utils/deposit";
+import { deposit } from "@/lib/deposit";
 export default function Settings() {
   const { logout, user } = usePrivy();
   const {
@@ -61,7 +61,7 @@ export default function Settings() {
       <Text>{smartWallet?.address}</Text>
       <Button
         onPress={() => {
-          deposit(client!, 100).then((receipt) => {
+          deposit(client!, 10).then((receipt) => {
             console.log(receipt);
           });
         }}

@@ -2,11 +2,17 @@ import { router } from "expo-router";
 import { ChevronRight, ScanLine } from "lucide-react-native";
 import React, { useEffect, useState } from "react";
 import { Text, View } from "react-native";
+import { toast } from "sonner-native";
 
 import { Button } from "@/components/ui/button";
 import Drawer from "@/components/ui/drawer";
 import { NumPad } from "@/components/ui/numpad";
 import { NumScreen } from "@/components/ui/numscreen";
+import { withdraw } from "@/lib/withdraw";
+import { useSmartWallets } from "@privy-io/expo/smart-wallets";
+import { triggerHaptic } from "@/utils/haptics";
+import useStore from "@/store/useStore";
+
 export default function WithdrawDrawer({
   isVisible,
   onClose,
@@ -15,12 +21,43 @@ export default function WithdrawDrawer({
   onClose: () => void;
 }) {
   const [number, setNumber] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const { client } = useSmartWallets();
+  const { fetchPositionData } = useStore();
+  const handleWithdraw = async (): Promise<any> => {
+    triggerHaptic("heavy");
+    if (!client || number <= 0) return;
+
+    return toast.promise(
+      (async () => {
+        try {
+          setIsLoading(true);
+          const receipt = await withdraw(client, number);
+          fetchPositionData();
+          triggerHaptic("success");
+          onClose();
+          return receipt;
+        } catch (error) {
+          triggerHaptic("error");
+          throw error;
+        } finally {
+          setIsLoading(false);
+        }
+      })(),
+      {
+        loading: "Withdrawing...",
+        success: (receipt) => `Withdrawal successful!`,
+        error: "Withdrawal failed",
+      }
+    );
+  };
+
   return (
     <Drawer isVisible={isVisible} onClose={onClose} isBlack>
       <Header />
       <NumScreen number={number} />
       <NumPad setNumber={setNumber} allowDecimals maxValue={999999.99} />
-      <Actions />
+      <Actions isLoading={isLoading} onWithdraw={handleWithdraw} />
     </Drawer>
   );
 }
@@ -44,14 +81,19 @@ const Header = () => {
   );
 };
 
-const Actions = () => {
+const Actions = ({
+  isLoading,
+  onWithdraw,
+}: {
+  isLoading: boolean;
+  onWithdraw: () => Promise<void>;
+}) => {
   return (
     <View className="w-full flex-row items-center justify-end py-4">
       <Button
-        onPress={() => {
-          // router.push("/login");
-        }}
+        onPress={onWithdraw}
         isWhite
+        disabled={isLoading}
         className="h-14 w-[35vw] flex-row items-center justify-around pl-1"
       >
         <Text className="font-sans-extrabold text-lg">Withdraw</Text>
