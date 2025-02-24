@@ -66,29 +66,64 @@ export const getUserActions = async (walletAddress: string) => {
   return json;
 };
 
-export const getAaveApy = async () => {
-  const timestamp = Math.floor(Date.now() / 1000) - 365 * 86400; // Subtract one year (365 days)
-  console.log("timestamp", timestamp);
-  const apiUrl = `https://aave-api-v2.aave.com/data/rates-history?reserveId=0x833589fcd6edb6e08f4c7c32d4f71b54bda029130xe20fCBdBfFC4Dd138cE8b2E6FBb6CB49777ad64D8453&from=${timestamp}&resolutionInHours=40`;
+export const getApy = async () => {
+  const timestamp7Days = Math.floor(Date.now() / 1000) - 7 * 86400;
+  const apiUrl = `https://aave-api-v2.aave.com/data/rates-history?reserveId=0x833589fcd6edb6e08f4c7c32d4f71b54bda029130xe20fCBdBfFC4Dd138cE8b2E6FBb6CB49777ad64D8453&from=${timestamp7Days}&resolutionInHours=24`;
+
   const response = await fetch(apiUrl);
-  const json = await response.json();
+  const data = await response.json();
 
-  // Calculate averages across all entries
-  const liquidityRateSum = json.reduce(
-    (sum: number, entry: any) => sum + entry.liquidityRate_avg,
-    0
-  );
-  const utilizationRateSum = json.reduce(
-    (sum: number, entry: any) => sum + entry.utilizationRate_avg,
-    0
-  );
+  // Get the newest rate (last entry)
+  const newestRate = data[data.length - 1].liquidityRate_avg;
+  const totalSupply = data[data.length - 1].utilizationRate_avg * 240000000;
 
-  const liquidityRateAvg = liquidityRateSum / json.length;
-  const utilizationRateAvg = utilizationRateSum / json.length;
+  // Calculate last week's average (excluding the newest rate)
+  const lastWeekAvg =
+    data
+      .slice(0, -1)
+      .reduce((sum: number, entry: any) => sum + entry.liquidityRate_avg, 0) /
+    (data.length - 1);
 
-  console.log("AAVE API", json);
+  // Calculate variation (difference between newest and last week's average)
+  const apyVariation = ((newestRate - lastWeekAvg) / lastWeekAvg) * 100;
+
   return {
-    liquidityRate: liquidityRateAvg,
-    utilizationRate: utilizationRateAvg,
+    apy: newestRate,
+    apyVariation,
+    totalSupply,
+  };
+};
+
+export const getApyHistory = async (timeframe: "W" | "M" | "6M" | "Y") => {
+  const now = Math.floor(Date.now() / 1000);
+
+  // Calculate resolution and fromTimestamp based on timeframe
+  const timeframeConfig = {
+    W: { seconds: 7 * 86400, resolution: 8 }, // 8 hours for 1 week
+    M: { seconds: 30 * 86400, resolution: 36 }, // 36 hours for 1 month
+    "6M": { seconds: 180 * 86400, resolution: 216 }, // 216 hours for 6 months
+    Y: { seconds: 365 * 86400, resolution: 438 }, // 438 hours for 1 year
+  };
+
+  const { seconds, resolution } = timeframeConfig[timeframe];
+  const fromTimestamp = now - seconds;
+
+  const apiUrl = `https://aave-api-v2.aave.com/data/rates-history?reserveId=0x833589fcd6edb6e08f4c7c32d4f71b54bda029130xe20fCBdBfFC4Dd138cE8b2E6FBb6CB49777ad64D8453&from=${fromTimestamp}&resolutionInHours=${resolution}`;
+  console.log("apiUrl", apiUrl);
+  const response = await fetch(apiUrl);
+  const data = await response.json();
+
+  // Calculate average and sort rates from oldest to newest
+  const avgRate =
+    data.reduce((sum: number, entry: any) => sum + entry.liquidityRate_avg, 0) /
+    data.length;
+  const rateHistory = data.map((entry: any) => entry.liquidityRate_avg);
+
+  console.log("rateHistory", rateHistory);
+  console.log("avgRate", avgRate);
+
+  return {
+    avgRate,
+    rateHistory,
   };
 };

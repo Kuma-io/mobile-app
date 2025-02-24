@@ -1,7 +1,12 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getAaveApy, getUserActions, getUserPositions } from "@/lib/api";
+import {
+  getUserActions,
+  getUserPositions,
+  getApy,
+  getApyHistory,
+} from "@/lib/api";
 
 interface UserPosition {
   timestamp: string;
@@ -40,8 +45,6 @@ interface StoreState {
     positionData: ChartData[];
     actions: Action[];
     timeframe: Timeframe;
-    aaveApy: number;
-    poolUtilizationRate: number;
   };
   // Actions
   updateWalletAddress: (walletAddress: string) => void;
@@ -51,18 +54,24 @@ interface StoreState {
   updateTimeframe: (timeframe: Timeframe) => void;
   fetchPositionData: () => Promise<void>;
   fetchActions: () => Promise<void>;
-  fetchAaveApy: () => Promise<void>;
+
+  stats: {
+    apy: number;
+    apyVariation: number;
+    totalSupply: number;
+    timeframe: "W" | "M" | "6M" | "Y";
+    avgApy: number;
+    apyHistory: number[];
+  };
+  fetchApy: () => Promise<void>;
+  fetchApyHistory: () => Promise<void>;
+  updateApyTimeframe: (timeframe: "W" | "M" | "6M" | "Y") => void;
   // Settings
   settings: {
     currencySlug: CurrencySlug;
   };
   updateSettings: (settings: Partial<StoreState["settings"]>) => void;
 }
-
-const DEFAULT_SETTINGS = {
-  currencySlug: "USD" as CurrencySlug,
-  timeframe: "H" as Timeframe,
-};
 
 const useStore = create<StoreState>()(
   persist(
@@ -76,8 +85,6 @@ const useStore = create<StoreState>()(
         positionData: [],
         actions: [],
         timeframe: "H" as Timeframe,
-        aaveApy: 0,
-        poolUtilizationRate: 0,
       },
       updateWalletAddress: (walletAddress: string) =>
         set((state) => ({
@@ -185,19 +192,50 @@ const useStore = create<StoreState>()(
           console.error("Error fetching actions:", error);
         }
       },
-      fetchAaveApy: async () => {
-        const json = await getAaveApy();
+
+      // Stats
+      stats: {
+        apy: 0,
+        apyVariation: 0,
+        totalSupply: 0,
+        timeframe: "W" as "W" | "M" | "6M" | "Y",
+        avgApy: 0,
+        apyHistory: [],
+      },
+      fetchApy: async () => {
+        const json = await getApy();
         set((state) => ({
-          data: {
-            ...state.data,
-            aaveApy: json.liquidityRate,
-            poolUtilizationRate: json.utilizationRate,
+          stats: {
+            ...state.stats,
+            apy: json.apy,
+            apyVariation: json.apyVariation,
+            totalSupply: json.totalSupply,
           },
         }));
       },
-
+      fetchApyHistory: async () => {
+        const { timeframe } = get().stats;
+        console.log("apy history timeframe", timeframe);
+        const json = await getApyHistory(timeframe);
+        set((state) => ({
+          stats: {
+            ...state.stats,
+            avgApy: json.avgRate,
+            apyHistory: json.rateHistory,
+          },
+        }));
+      },
+      updateApyTimeframe: (timeframe: "W" | "M" | "6M" | "Y") =>
+        set((state) => ({
+          stats: {
+            ...state.stats,
+            timeframe,
+          },
+        })),
       // Settings
-      settings: DEFAULT_SETTINGS,
+      settings: {
+        currencySlug: "USD" as CurrencySlug,
+      },
       updateSettings: (newSettings) =>
         set((state) => {
           const updatedSettings = {
@@ -214,6 +252,7 @@ const useStore = create<StoreState>()(
       partialize: (state) => ({
         settings: state.settings,
         data: state.data,
+        stats: state.stats,
       }),
       onRehydrateStorage: () => (state) => {
         console.log("Rehydrated state:", state);

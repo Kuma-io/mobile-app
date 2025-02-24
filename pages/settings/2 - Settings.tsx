@@ -8,6 +8,7 @@ import GoogleSvg from "@/assets/svg/google.svg";
 import useStore from "@/store/useStore";
 import { useSmartWallets } from "@privy-io/expo/smart-wallets";
 import { transfer } from "@/lib/transfer";
+
 export default function Settings() {
   const { logout, user } = usePrivy();
   const {

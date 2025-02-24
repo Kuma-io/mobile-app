@@ -1,12 +1,21 @@
 import React from "react";
 import useStore from "@/store/useStore";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { formatYield } from "@/utils/formatYield";
-
+import { router } from "expo-router";
 export default function Stats() {
   return (
     <View className="w-full flex-col items-start justify-between gap-2 px-8">
-      <Text className="font-sans-bold text-lg text-gray-400">Statistics</Text>
+      <View className="flex-row items-center justify-between w-full">
+        <Text className="font-sans-bold text-lg text-gray-400">Statistics</Text>
+        <Pressable
+          onPress={() => {
+            router.push("/stats");
+          }}
+        >
+          <Text className="font-sans-black text-sm">More</Text>
+        </Pressable>
+      </View>
       <View className="flex w-full flex-row items-center justify-around gap-4">
         <AaveYield />
         <Rewards />
@@ -16,20 +25,25 @@ export default function Stats() {
 }
 
 const AaveYield = () => {
-  const { data } = useStore();
-  const annualYield = data.aaveApy;
-  const poolUtilizationRate = data.poolUtilizationRate;
+  const { stats } = useStore();
+  const annualYield = stats.apy;
+  const aaveApyVariation = stats.apyVariation;
   return (
     <View className="h-24 flex-1 items-center rounded-2xl bg-black">
-      <View className="items-start flex-1 justify-around p-4 pt-3 pl-5">
+      <View className="items-start flex-1 justify-around p-4 pt-3 pl-8">
         <Text className="font-sans-medium text-sm text-gray-400">
-          Annual Yield
+          Live Yield
         </Text>
         <Text className="font-sans-bold text-3xl text-white">
-          {(annualYield * 100).toFixed(2)}%
+          {(annualYield * 100).toFixed(3)}%
         </Text>
-        <Text className="mt-1 font-sans-bold text-sm text-red-500">
-          {/* ▼ {poolUtilizationRate.toFixed(2)}% */}
+        <Text
+          className={`mt-1 font-sans-bold text-sm ${
+            aaveApyVariation < 0 ? "text-red-500" : "text-green-500"
+          }`}
+        >
+          {aaveApyVariation < 0 ? "▼" : "▲"}
+          {aaveApyVariation.toFixed(3)}%
         </Text>
       </View>
     </View>
@@ -43,7 +57,7 @@ const Rewards = () => {
   const annualYield = principal > 0 ? (yieldValue / principal) * 100 : 0;
   return (
     <View className="h-24 flex-1 items-center justify-center rounded-2xl bg-black">
-      <View className="items-start flex-1 justify-around p-4 pt-3 pl-5">
+      <View className="items-start flex-1 justify-around p-4 pt-3 pl-6">
         <Text className="font-sans-medium text-sm text-gray-400">
           Profit Made
         </Text>

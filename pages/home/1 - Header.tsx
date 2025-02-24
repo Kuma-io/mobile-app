@@ -10,8 +10,13 @@ import { registerUser } from "@/lib/api";
 
 export default function Header() {
   const { user } = usePrivy();
-  const { updateWalletAddress, fetchPositionData, fetchActions, fetchAaveApy } =
-    useStore();
+  const {
+    updateWalletAddress,
+    fetchPositionData,
+    fetchActions,
+    fetchApy,
+    fetchApyHistory,
+  } = useStore();
   const wallet = useEmbeddedWallet();
 
   useEffect(() => {
@@ -35,11 +40,8 @@ export default function Header() {
         if (email) {
           await registerUser(walletAddress, email);
         }
-        await Promise.all([
-          fetchPositionData(),
-          fetchActions(),
-          fetchAaveApy(),
-        ]);
+        await Promise.all([fetchPositionData(), fetchActions(), fetchApy()]);
+        fetchApyHistory();
       }
     };
 

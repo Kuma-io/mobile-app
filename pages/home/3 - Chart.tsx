@@ -116,10 +116,10 @@ function TimeFrameSelector({
   timeFrame,
   onTimeFrameChange,
 }: TimeFrameSelectorProps) {
-  const timeFrames = ["1H", "1D", "1W", "1M", "1Y"];
+  const timeFrames = ["1H", "1D", "1W", "1M", "MAX"];
 
   return (
-    <View className="mx-auto flex w-[70%] flex-row justify-between">
+    <View className="pl-8 flex w-[70%] flex-row justify-between">
       {timeFrames.map((frame) => (
         <TouchableOpacity
           key={frame}
@@ -129,7 +129,7 @@ function TimeFrameSelector({
           <Text
             className={`${
               timeFrame === frame ? "text-black" : "text-gray-500"
-            } font-sans-bold `}
+            } font-sans-bold`}
           >
             {frame}
           </Text>
