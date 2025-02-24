@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getUserActions, getUserPositions } from "@/lib/api";
+import { getAaveApy, getUserActions, getUserPositions } from "@/lib/api";
 
 interface UserPosition {
   timestamp: string;
@@ -40,6 +40,8 @@ interface StoreState {
     positionData: ChartData[];
     actions: Action[];
     timeframe: Timeframe;
+    aaveApy: number;
+    poolUtilizationRate: number;
   };
   // Actions
   updateWalletAddress: (walletAddress: string) => void;
@@ -49,6 +51,7 @@ interface StoreState {
   updateTimeframe: (timeframe: Timeframe) => void;
   fetchPositionData: () => Promise<void>;
   fetchActions: () => Promise<void>;
+  fetchAaveApy: () => Promise<void>;
   // Settings
   settings: {
     currencySlug: CurrencySlug;
@@ -73,6 +76,8 @@ const useStore = create<StoreState>()(
         positionData: [],
         actions: [],
         timeframe: "H" as Timeframe,
+        aaveApy: 0,
+        poolUtilizationRate: 0,
       },
       updateWalletAddress: (walletAddress: string) =>
         set((state) => ({
@@ -179,6 +184,16 @@ const useStore = create<StoreState>()(
         } catch (error) {
           console.error("Error fetching actions:", error);
         }
+      },
+      fetchAaveApy: async () => {
+        const json = await getAaveApy();
+        set((state) => ({
+          data: {
+            ...state.data,
+            aaveApy: json.liquidityRate,
+            poolUtilizationRate: json.utilizationRate,
+          },
+        }));
       },
 
       // Settings

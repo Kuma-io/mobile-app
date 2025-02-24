@@ -16,15 +16,20 @@ export default function Stats() {
 }
 
 const AaveYield = () => {
+  const { data } = useStore();
+  const annualYield = data.aaveApy;
+  const poolUtilizationRate = data.poolUtilizationRate;
   return (
     <View className="h-24 flex-1 items-center rounded-2xl bg-black">
       <View className="items-start flex-1 justify-around p-4 pt-3 pl-5">
         <Text className="font-sans-medium text-sm text-gray-400">
           Annual Yield
         </Text>
-        <Text className="font-sans-bold text-3xl text-white">8.24%</Text>
+        <Text className="font-sans-bold text-3xl text-white">
+          {(annualYield * 100).toFixed(2)}%
+        </Text>
         <Text className="mt-1 font-sans-bold text-sm text-red-500">
-          ▼ 12.45%
+          {/* ▼ {poolUtilizationRate.toFixed(2)}% */}
         </Text>
       </View>
     </View>
