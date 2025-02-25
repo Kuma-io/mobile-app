@@ -7,8 +7,13 @@ import {
   CircleDollarSign,
 } from "lucide-react-native";
 import { router } from "expo-router";
+import { CurrencySign } from "@/types/currency-sign";
+
 export default function Activity() {
-  const { actions } = useStore((state) => state.data);
+  const {
+    data: { actions },
+    settings: { currencySlug, currencyRate },
+  } = useStore();
 
   const sortedActions = [...actions].sort(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
@@ -57,7 +62,12 @@ export default function Activity() {
             </View>
             <Text className="font-sans-bold text-xl">
               {item.action.toLowerCase() === "withdraw" ? "-" : ""}
-              {item.amount}$
+              {`${(Number(item.amount) * currencyRate).toFixed(
+                item.action.toLowerCase() === "rewards" ? 6 : 2
+              )}${
+                CurrencySign.find((currency) => currency.slug === currencySlug)
+                  ?.sign
+              }`}
             </Text>
           </View>
         ))}

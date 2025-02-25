@@ -3,10 +3,12 @@ import React from "react";
 import useStore from "@/store/useStore";
 import { parseUnits } from "viem";
 import { formatYield } from "@/utils/formatYield";
+import { CurrencySign } from "@/types/currency-sign";
 
 export default function Balance() {
   const {
     data: { balance, principal, yieldValue },
+    settings: { currencySlug, currencyRate },
   } = useStore();
   const annualYield = principal > 0 ? (yieldValue / principal) * 100 : 0;
 
@@ -14,7 +16,9 @@ export default function Balance() {
     <View className="w-full items-start justify-center px-8 pb-4">
       <Text className="mb-2 font-sans-bold text-lg text-gray-400">Balance</Text>
       <Text className="font-sans-extrabold text-4xl tracking-[0.05em]">
-        {`${balance}$`}
+        {`${(balance * currencyRate).toFixed(6)}${
+          CurrencySign.find((currency) => currency.slug === currencySlug)?.sign
+        }`}
       </Text>
       <Text
         className={`font-sans-bold text-sm ${

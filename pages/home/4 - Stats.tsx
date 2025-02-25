@@ -3,7 +3,11 @@ import useStore from "@/store/useStore";
 import { Pressable, Text, View } from "react-native";
 import { formatYield } from "@/utils/formatYield";
 import { router } from "expo-router";
+import { CurrencySign } from "@/types/currency-sign";
 export default function Stats() {
+  const {
+    settings: { currencySlug },
+  } = useStore();
   return (
     <View className="w-full flex-col items-start justify-between gap-2 px-8">
       <View className="flex-row items-center justify-between w-full">
@@ -53,6 +57,7 @@ const AaveYield = () => {
 const Rewards = () => {
   const {
     data: { balance, principal, yieldValue },
+    settings: { currencySlug, currencyRate },
   } = useStore();
   const annualYield = principal > 0 ? (yieldValue / principal) * 100 : 0;
   return (
@@ -63,18 +68,25 @@ const Rewards = () => {
         </Text>
         <Text className="font-sans-bold text-3xl text-white">
           {(() => {
-            const value = formatYield(yieldValue);
+            const value = formatYield(yieldValue * currencyRate);
             if (value.includes("e")) {
               const [base, exponent] = value.split("e");
               return (
                 <>
                   {`${base}`}
                   <Text className="font-sans-thin text-lg">e{exponent} </Text>
-                  {`$`}
+                  {`${
+                    CurrencySign.find(
+                      (currency) => currency.slug === currencySlug
+                    )?.sign
+                  }`}
                 </>
               );
             }
-            return `${value}$`;
+            return `${value}${
+              CurrencySign.find((currency) => currency.slug === currencySlug)
+                ?.sign
+            }`;
           })()}
         </Text>
         <Text

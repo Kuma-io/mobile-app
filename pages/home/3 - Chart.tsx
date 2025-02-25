@@ -23,6 +23,7 @@ const timeframeMap: { [key: string]: string } = {
 export default function Chart() {
   const {
     data: { positionData, timeframe, balance },
+    settings: { currencyRate },
     fetchPositionData,
     updateTimeframe,
     updateBalance,

@@ -16,6 +16,8 @@ export default function Header() {
     fetchActions,
     fetchApy,
     fetchApyHistory,
+    fetchNotification,
+    fetchCurrencyRate,
   } = useStore();
   const wallet = useEmbeddedWallet();
 
@@ -42,6 +44,8 @@ export default function Header() {
         }
         await Promise.all([fetchPositionData(), fetchActions(), fetchApy()]);
         fetchApyHistory();
+        fetchNotification();
+        fetchCurrencyRate();
       }
     };
 

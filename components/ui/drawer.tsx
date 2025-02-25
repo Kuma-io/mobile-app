@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from "react";
 import {
   Animated,
   Dimensions,
@@ -7,7 +7,8 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
   View,
-} from 'react-native';
+  ViewStyle,
+} from "react-native";
 
 interface DrawerProps {
   isVisible: boolean;
@@ -15,6 +16,7 @@ interface DrawerProps {
   children: React.ReactNode;
   height?: number;
   isBlack?: boolean;
+  style?: ViewStyle;
 }
 
 const CLOSE_THRESHOLD = 0.2;
@@ -24,8 +26,9 @@ const Drawer: React.FC<DrawerProps> = ({
   isVisible,
   onClose,
   children,
-  height = Dimensions.get('window').height * 0.9,
+  height = Dimensions.get("window").height * 0.9,
   isBlack = false,
+  style,
 }) => {
   const translateY = useRef(new Animated.Value(height)).current;
   const overlayOpacity = useRef(new Animated.Value(0)).current;
@@ -45,7 +48,8 @@ const Drawer: React.FC<DrawerProps> = ({
         const draggedDistance = gestureState.dy;
         const dragPercentage = draggedDistance / height;
         const shouldClose =
-          dragPercentage > CLOSE_THRESHOLD || gestureState.vy > VELOCITY_THRESHOLD;
+          dragPercentage > CLOSE_THRESHOLD ||
+          gestureState.vy > VELOCITY_THRESHOLD;
 
         if (shouldClose) {
           closeDrawer();
@@ -120,9 +124,11 @@ const Drawer: React.FC<DrawerProps> = ({
           {
             height,
             transform: [{ translateY }],
-            backgroundColor: isBlack ? '#000000' : 'white',
+            backgroundColor: isBlack ? "#000000" : "white",
           },
-        ]}>
+          style,
+        ]}
+      >
         <View style={styles.handle} />
         <SafeAreaView className="flex-1">{children}</SafeAreaView>
       </Animated.View>
@@ -137,17 +143,17 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   drawer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
     borderTopLeftRadius: 40,
     borderTopRightRadius: 40,
     padding: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: -3,
@@ -158,14 +164,14 @@ const styles = StyleSheet.create({
     paddingTop: 25,
   },
   handle: {
-    position: 'absolute',
+    position: "absolute",
     width: 40,
     height: 4,
-    backgroundColor: '#DEDEDE',
+    backgroundColor: "#DEDEDE",
     borderRadius: 2,
-    alignSelf: 'center',
+    alignSelf: "center",
     top: -12,
-    left: '50%',
+    left: "50%",
     zIndex: 1,
   },
 });

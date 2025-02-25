@@ -1,5 +1,6 @@
-import { Timeframe } from "@/store/useStore";
+import { CurrencySlug, Timeframe } from "@/store/useStore";
 
+// POST
 export const registerUser = async (walletAddress: string, email: string) => {
   const apiUrl = `https://kuma-server.vercel.app/register-user/${walletAddress}/${email}`;
   const response = await fetch(apiUrl, {
@@ -40,6 +41,21 @@ export const registerUserPosition = async (walletAddress: string) => {
   return json;
 };
 
+export const registerUserNotification = async (
+  walletAddress: string,
+  notification: boolean
+) => {
+  const apiUrl = `https://kuma-server.vercel.app/register-user-notification/${walletAddress}/${notification}`;
+  const response = await fetch(apiUrl, {
+    headers: {
+      "x-api-key": "1234567890",
+    },
+  });
+  const json = await response.json();
+  return json;
+};
+
+// GET
 export const getUserPositions = async (
   walletAddress: string,
   timeframe: Timeframe
@@ -66,9 +82,20 @@ export const getUserActions = async (walletAddress: string) => {
   return json;
 };
 
+export const getUserNotifications = async (walletAddress: string) => {
+  const apiUrl = `https://kuma-server.vercel.app/get-user-notification/${walletAddress}`;
+  const response = await fetch(apiUrl, {
+    headers: {
+      "x-api-key": "1234567890",
+    },
+  });
+  const json = await response.json();
+  return json;
+};
+
 export const getApy = async () => {
   const timestamp7Days = Math.floor(Date.now() / 1000) - 7 * 86400;
-  const apiUrl = `https://aave-api-v2.aave.com/data/rates-history?reserveId=0x833589fcd6edb6e08f4c7c32d4f71b54bda029130xe20fCBdBfFC4Dd138cE8b2E6FBb6CB49777ad64D8453&from=${timestamp7Days}&resolutionInHours=24`;
+  const apiUrl = `https://aave-api-v2.aave.com/data/rates-history?reserveId=0x833589fcd6edb6e08f4c7c32d4f71b54bda029130xe20fCBdBfFC4Dd138cE8b2E6FBb6CB49777ad64D8453&from=${timestamp7Days}&resolutionInHours=6`;
 
   const response = await fetch(apiUrl);
   const data = await response.json();
@@ -99,7 +126,7 @@ export const getApyHistory = async (timeframe: "W" | "M" | "6M" | "Y") => {
 
   // Calculate resolution and fromTimestamp based on timeframe
   const timeframeConfig = {
-    W: { seconds: 7 * 86400, resolution: 8 }, // 8 hours for 1 week
+    W: { seconds: 7 * 86400, resolution: 6 }, // 6 hours for 1 week
     M: { seconds: 30 * 86400, resolution: 36 }, // 36 hours for 1 month
     "6M": { seconds: 180 * 86400, resolution: 216 }, // 216 hours for 6 months
     Y: { seconds: 365 * 86400, resolution: 438 }, // 438 hours for 1 year
@@ -126,4 +153,15 @@ export const getApyHistory = async (timeframe: "W" | "M" | "6M" | "Y") => {
     avgRate,
     rateHistory,
   };
+};
+
+export const getCurrencyRate = async (currencySlug: CurrencySlug) => {
+  if (currencySlug === "USD") {
+    return 1;
+  }
+  const apiUrl = `https://min-api.cryptocompare.com/data/price?fsym=USDC&tsyms=${currencySlug}&api_key=059fad215d1927895c58d9ec92b3dd995165bfcc8fd797ab2d070d4e10c44c1f`;
+  const response = await fetch(apiUrl);
+  const json = await response.json();
+
+  return json[currencySlug];
 };

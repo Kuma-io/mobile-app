@@ -1,10 +1,8 @@
 import { publicClient } from "../utils/publicClient";
-import { FACTORY_ADDRESS, FACTORY_ABI, USDC_ADDRESS } from "../utils/contract";
+import { USDC_ADDRESS } from "../utils/contract";
 import type { SmartWalletClientType } from "@privy-io/js-sdk-core/smart-wallets";
 import { parseUnits, erc20Abi } from "viem";
-import { registerUserActions, registerUserPosition } from "./api";
-const serverUrl = process.env.SERVER_URL;
-const serverApiKey = process.env.SERVER_API_KEY;
+import { registerUserPosition } from "./api";
 
 export const transfer = async (
   client: SmartWalletClientType,

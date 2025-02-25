@@ -6,6 +6,9 @@ import {
   getUserPositions,
   getApy,
   getApyHistory,
+  registerUserNotification,
+  getUserNotifications,
+  getCurrencyRate,
 } from "@/lib/api";
 
 interface UserPosition {
@@ -25,15 +28,7 @@ interface ChartData {
   value: number;
 }
 
-export type CurrencySlug =
-  | "USD"
-  | "EUR"
-  | "GBP"
-  | "JPY"
-  | "CHF"
-  | "AUD"
-  | "CAD"
-  | "NZD";
+export type CurrencySlug = "USD" | "EUR" | "GBP";
 export type Timeframe = "H" | "D" | "W" | "M" | "Y";
 
 interface StoreState {
@@ -69,8 +64,13 @@ interface StoreState {
   // Settings
   settings: {
     currencySlug: CurrencySlug;
+    currencyRate: number;
+    notification: boolean;
   };
-  updateSettings: (settings: Partial<StoreState["settings"]>) => void;
+  updateNotification: (notification: boolean) => void;
+  fetchNotification: () => Promise<void>;
+  updateCurrencySlug: (currencySlug: CurrencySlug) => void;
+  fetchCurrencyRate: () => Promise<void>;
 }
 
 const useStore = create<StoreState>()(
@@ -235,16 +235,56 @@ const useStore = create<StoreState>()(
       // Settings
       settings: {
         currencySlug: "USD" as CurrencySlug,
+        currencyRate: 1,
+        notification: true,
       },
-      updateSettings: (newSettings) =>
-        set((state) => {
-          const updatedSettings = {
+      updateNotification: async (notification: boolean) => {
+        const { walletAddress } = get().data;
+        if (!walletAddress) {
+          console.error("No wallet address available");
+          return;
+        }
+        registerUserNotification(walletAddress, notification);
+        set((state) => ({
+          settings: {
             ...state.settings,
-            ...newSettings,
-          };
-          console.log("Updated settings:", updatedSettings);
-          return { settings: updatedSettings };
-        }),
+            notification,
+          },
+        }));
+      },
+      fetchNotification: async () => {
+        const { walletAddress } = get().data;
+        if (!walletAddress) {
+          console.error("No wallet address available");
+          return;
+        }
+        const json = await getUserNotifications(walletAddress);
+        set((state) => ({
+          settings: {
+            ...state.settings,
+            notification: json.notification,
+          },
+        }));
+      },
+      updateCurrencySlug: (currencySlug: CurrencySlug) => {
+        set((state) => ({
+          settings: {
+            ...state.settings,
+            currencySlug,
+          },
+        }));
+        get().fetchCurrencyRate();
+      },
+      fetchCurrencyRate: async () => {
+        const { currencySlug } = get().settings;
+        const json = await getCurrencyRate(currencySlug);
+        set((state) => ({
+          settings: {
+            ...state.settings,
+            currencyRate: json,
+          },
+        }));
+      },
     }),
     {
       name: "app-storage",

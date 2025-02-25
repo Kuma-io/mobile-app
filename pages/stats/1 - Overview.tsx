@@ -1,11 +1,13 @@
 import { Text, View } from "react-native";
 import React from "react";
 import useStore from "@/store/useStore";
-import { formatUnits } from "viem";
-import { formatYield } from "@/utils/formatYield";
+import { CurrencySign } from "@/types/currency-sign";
 
 export default function Overview() {
-  const { stats } = useStore();
+  const {
+    stats,
+    settings: { currencySlug, currencyRate },
+  } = useStore();
 
   return (
     <View className="w-full flex-row items-center justify-between px-6 pb-4">
@@ -14,7 +16,10 @@ export default function Overview() {
           Total Supplied
         </Text>
         <Text className="font-sans-extrabold text-4xl tracking-[0.05em] pl-2">
-          {`${(stats.totalSupply / 1000000).toFixed(2)}M$`}
+          {`${((stats.totalSupply * currencyRate) / 1000000).toFixed(2)}M ${
+            CurrencySign.find((currency) => currency.slug === currencySlug)
+              ?.sign
+          }`}
         </Text>
       </View>
       <View className="flex-col items-end">

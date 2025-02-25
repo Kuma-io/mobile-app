@@ -3,8 +3,6 @@ import { FACTORY_ADDRESS, FACTORY_ABI } from "../utils/contract";
 import type { SmartWalletClientType } from "@privy-io/js-sdk-core/smart-wallets";
 import { parseUnits } from "viem";
 import { registerUserActions, registerUserPosition } from "./api";
-const serverUrl = process.env.SERVER_URL;
-const serverApiKey = process.env.SERVER_API_KEY;
 
 export const withdraw = async (
   client: SmartWalletClientType,

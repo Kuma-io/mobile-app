@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 
 export default function Actions() {
   const insets = useSafeAreaInsets();
-  const { logout, user } = usePrivy();
+  const { logout } = usePrivy();
   return (
     <View
       style={{

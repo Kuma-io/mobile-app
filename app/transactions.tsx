@@ -11,6 +11,7 @@ import {
   CircleDollarSign,
 } from "lucide-react-native";
 import useStore from "@/store/useStore";
+import { CurrencySign } from "@/types/currency-sign";
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -55,7 +56,10 @@ const Header = () => {
 };
 
 const Transactions = () => {
-  const { actions } = useStore((state) => state.data);
+  const {
+    data: { actions },
+    settings: { currencySlug, currencyRate },
+  } = useStore();
 
   const groupedActions: GroupedActions = actions.reduce((groups, action) => {
     const date = new Date(action.timestamp);
@@ -117,7 +121,13 @@ const Transactions = () => {
                 </View>
                 <Text className="font-sans-bold text-xl">
                   {item.action.toLowerCase() === "withdraw" ? "-" : ""}
-                  {item.amount}$
+                  {`${(Number(item.amount) * currencyRate).toFixed(
+                    item.action.toLowerCase() === "rewards" ? 6 : 2
+                  )}${
+                    CurrencySign.find(
+                      (currency) => currency.slug === currencySlug
+                    )?.sign
+                  }`}
                 </Text>
               </View>
             ))}

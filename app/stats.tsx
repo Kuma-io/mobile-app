@@ -4,18 +4,11 @@ import { SafeAreaView, ScrollView, View, Text } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button } from "@/components/ui/button";
-import {
-  ArrowDownToLine,
-  ArrowUpToLine,
-  ChevronLeft,
-  CircleDollarSign,
-} from "lucide-react-native";
-import useStore from "@/store/useStore";
+import { ChevronLeft } from "lucide-react-native";
 import Overview from "@/pages/stats/1 - Overview";
 import Chart from "@/pages/stats/2 - Chart";
 
 export default function StatsPage() {
-  const { stats } = useStore();
   return (
     <>
       <Stack.Screen options={{ title: "Stats", headerShown: false }} />
