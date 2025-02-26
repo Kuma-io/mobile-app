@@ -1,6 +1,6 @@
 import { useLoginWithOAuth } from "@privy-io/expo";
 import { ChevronRight } from "lucide-react-native";
-import React, { useEffect } from "react";
+import React from "react";
 import { Text, TextInput, View } from "react-native";
 
 import { Button } from "@/components/ui/button";
@@ -118,7 +118,7 @@ const SocialLogin = () => {
       <Button
         onPress={() => {
           login({
-            provider: "google",
+            provider: "apple",
           });
         }}
         className="w-full flex-row items-center justify-between bg-white/10 p-4 rounded-[20px] mt-1"

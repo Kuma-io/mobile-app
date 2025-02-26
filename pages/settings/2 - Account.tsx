@@ -1,12 +1,6 @@
 import { View, Text } from "react-native";
 import { Button } from "@/components/ui/button";
-import GoogleSvg from "@/assets/svg/google.svg";
-import {
-  ChevronRight,
-  CircleUserRound,
-  UserRound,
-  Wallet,
-} from "lucide-react-native";
+import { ChevronRight, UserRound, Wallet } from "lucide-react-native";
 import { usePrivy } from "@privy-io/expo";
 import useStore from "@/store/useStore";
 

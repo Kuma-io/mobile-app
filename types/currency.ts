@@ -3,3 +3,5 @@ export const CurrencySign = [
   { slug: "EUR", sign: "€" },
   { slug: "GBP", sign: "£" },
 ] as const;
+
+export type CurrencySlug = "USD" | "EUR" | "GBP";

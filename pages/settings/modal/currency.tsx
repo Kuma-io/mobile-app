@@ -1,16 +1,9 @@
-import { router } from "expo-router";
 import { Euro, DollarSign, PoundSterling, Check } from "lucide-react-native";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Text, View } from "react-native";
-import { toast } from "sonner-native";
 
 import { Button } from "@/components/ui/button";
 import Drawer from "@/components/ui/drawer";
-import { NumPad } from "@/components/ui/numpad";
-import { NumScreen } from "@/components/ui/numscreen";
-import { withdraw } from "@/lib/withdraw";
-import { useSmartWallets } from "@privy-io/expo/smart-wallets";
-import { triggerHaptic } from "@/utils/haptics";
 import useStore from "@/store/useStore";
 
 export default function CurrencyModal({
@@ -20,47 +13,6 @@ export default function CurrencyModal({
   isVisible: boolean;
   onClose: () => void;
 }) {
-  const [number, setNumber] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const { client } = useSmartWallets();
-  const { fetchPositionData, fetchActions } = useStore();
-
-  useEffect(() => {
-    if (!isVisible) {
-      setNumber(0);
-    }
-  }, [isVisible]);
-
-  const handleWithdraw = async (): Promise<any> => {
-    triggerHaptic("heavy");
-    if (!client || number <= 0) return;
-
-    return toast.promise(
-      (async () => {
-        try {
-          setIsLoading(true);
-          const receipt = await withdraw(client, number);
-          fetchPositionData();
-          fetchActions();
-          triggerHaptic("success");
-          onClose();
-          return receipt;
-        } catch (error) {
-          triggerHaptic("error");
-          console.log(error);
-          throw error;
-        } finally {
-          setIsLoading(false);
-        }
-      })(),
-      {
-        loading: "Withdrawing...",
-        success: (receipt) => `Withdrawal successful!`,
-        error: "Withdrawal failed",
-      }
-    );
-  };
-
   return (
     <Drawer
       isVisible={isVisible}
@@ -93,7 +45,7 @@ const CURRENCIES = [
 const SelectCurrency = () => {
   const {
     updateCurrencySlug,
-    settings: { currencySlug, currencyRate },
+    settings: { currencySlug },
   } = useStore();
 
   return (

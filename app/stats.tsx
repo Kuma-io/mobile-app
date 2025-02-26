@@ -5,8 +5,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react-native";
-import Overview from "@/pages/stats/1 - Overview";
-import Chart from "@/pages/stats/2 - Chart";
+
+import { Overview, Chart, Principal } from "@/pages/stats";
 
 export default function StatsPage() {
   return (
@@ -19,6 +19,8 @@ export default function StatsPage() {
           <Overview />
           <View className="w-full py-1" />
           <Chart />
+          <View className="w-full py-1" />
+          <Principal />
         </ScrollView>
         <Actions />
       </SafeAreaView>

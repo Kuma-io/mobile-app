@@ -1,5 +1,4 @@
 import { useLoginWithEmail } from "@privy-io/expo";
-import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Keyboard,

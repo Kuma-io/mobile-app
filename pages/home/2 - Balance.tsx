@@ -1,9 +1,8 @@
 import { Text, View } from "react-native";
 import React from "react";
 import useStore from "@/store/useStore";
-import { parseUnits } from "viem";
 import { formatYield } from "@/utils/formatYield";
-import { CurrencySign } from "@/types/currency-sign";
+import { CurrencySign } from "@/types/currency";
 
 export default function Balance() {
   const {

@@ -7,7 +7,7 @@ import {
   CircleDollarSign,
 } from "lucide-react-native";
 import { router } from "expo-router";
-import { CurrencySign } from "@/types/currency-sign";
+import { CurrencySign } from "@/types/currency";
 
 export default function Activity() {
   const {
@@ -56,9 +56,19 @@ export default function Activity() {
                   <ArrowUpToLine size={20} color="white" strokeWidth={3} />
                 )}
               </View>
-              <Text className="font-sans-bold text-lg">
-                {item.action.toUpperCase()}
-              </Text>
+              <View className="flex-col items-start justify-center">
+                <Text className="font-sans-bold text-lg">
+                  {item.action.toUpperCase()}
+                </Text>
+                <Text className="font-sans-medium text-xs text-gray-400">
+                  {new Date(item.timestamp).toLocaleTimeString([], {
+                    weekday: "short",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </Text>
+              </View>
             </View>
             <Text className="font-sans-bold text-xl">
               {item.action.toLowerCase() === "withdraw" ? "-" : ""}

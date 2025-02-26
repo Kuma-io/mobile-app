@@ -6,7 +6,7 @@ import Header from "./1 - Header";
 import Balance from "./2 - Balance";
 import Chart from "./3 - Chart";
 import Stats from "./4 - Stats";
-import Activity from "./5 - Transactions";
+import Transactions from "./5 - Transactions";
 import Action from "./6 - Action";
 export default function Homepage() {
   return (
@@ -22,7 +22,7 @@ export default function Homepage() {
             <Chart />
             <Stats />
             <View className="my-2 h-px w-full" />
-            <Activity />
+            <Transactions />
           </View>
         </ScrollView>
         <Action />

@@ -1,4 +1,4 @@
-import { CurrencySlug, Timeframe } from "@/store/useStore";
+import * as types from "@/types";
 
 // POST
 export const registerUser = async (walletAddress: string, email: string) => {
@@ -9,7 +9,7 @@ export const registerUser = async (walletAddress: string, email: string) => {
     },
   });
   const json = await response.json();
-  console.log(json);
+  registerUserPosition(walletAddress);
   return json;
 };
 
@@ -58,15 +58,18 @@ export const registerUserNotification = async (
 // GET
 export const getUserPositions = async (
   walletAddress: string,
-  timeframe: Timeframe
+  timeframe: types.UserPositionTimeframe
 ) => {
+  console.log("timeframe", timeframe);
   const apiUrl = `https://kuma-server.vercel.app/get-user-positions/${walletAddress}/${timeframe}`;
+  console.log("apiUrl", apiUrl);
   const response = await fetch(apiUrl, {
     headers: {
       "x-api-key": "1234567890",
     },
   });
   const json = await response.json();
+  console.log("json", json);
   return json;
 };
 
@@ -121,18 +124,19 @@ export const getApy = async () => {
   };
 };
 
-export const getApyHistory = async (timeframe: "W" | "M" | "6M" | "Y") => {
+export const getApyHistory = async (timeframe: types.ApyTimeframe) => {
   const now = Math.floor(Date.now() / 1000);
 
   // Calculate resolution and fromTimestamp based on timeframe
   const timeframeConfig = {
-    W: { seconds: 7 * 86400, resolution: 6 }, // 6 hours for 1 week
-    M: { seconds: 30 * 86400, resolution: 36 }, // 36 hours for 1 month
+    "1W": { seconds: 7 * 86400, resolution: 6 }, // 6 hours for 1 week
+    "1M": { seconds: 30 * 86400, resolution: 36 }, // 36 hours for 1 month
     "6M": { seconds: 180 * 86400, resolution: 216 }, // 216 hours for 6 months
-    Y: { seconds: 365 * 86400, resolution: 438 }, // 438 hours for 1 year
+    "1Y": { seconds: 365 * 86400, resolution: 438 }, // 438 hours for 1 year
   };
 
-  const { seconds, resolution } = timeframeConfig[timeframe];
+  const { seconds, resolution } =
+    timeframeConfig[timeframe as keyof typeof timeframeConfig];
   const fromTimestamp = now - seconds;
 
   const apiUrl = `https://aave-api-v2.aave.com/data/rates-history?reserveId=0x833589fcd6edb6e08f4c7c32d4f71b54bda029130xe20fCBdBfFC4Dd138cE8b2E6FBb6CB49777ad64D8453&from=${fromTimestamp}&resolutionInHours=${resolution}`;
@@ -155,7 +159,7 @@ export const getApyHistory = async (timeframe: "W" | "M" | "6M" | "Y") => {
   };
 };
 
-export const getCurrencyRate = async (currencySlug: CurrencySlug) => {
+export const getCurrencyRate = async (currencySlug: types.CurrencySlug) => {
   if (currencySlug === "USD") {
     return 1;
   }

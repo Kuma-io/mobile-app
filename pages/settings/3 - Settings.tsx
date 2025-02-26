@@ -4,9 +4,6 @@ import { ChevronRight, BellDot, BadgeEuro } from "lucide-react-native";
 import useStore from "@/store/useStore";
 import ToggleSwitch from "toggle-switch-react-native";
 
-import CurrencyModal from "./modal/currency";
-import React, { useState } from "react";
-
 export default function Settings({
   currencyModal,
   setCurrencyModal,

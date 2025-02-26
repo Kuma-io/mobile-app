@@ -1,4 +1,3 @@
-import { usePrivy } from "@privy-io/expo";
 import { ChevronRight } from "lucide-react-native";
 import React, { useState } from "react";
 import { Text, View } from "react-native";
@@ -8,7 +7,6 @@ import { Button } from "@/components/ui/button";
 
 export default function ActionPage() {
   const [isLoginDrawerVisible, setIsLoginDrawerVisible] = useState(false);
-  const { logout } = usePrivy();
   return (
     <>
       <View className="w-full items-end p-6">

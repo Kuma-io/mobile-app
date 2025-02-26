@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { CircleUserRound } from "lucide-react-native";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { Text, View } from "react-native";
 
 import { Button } from "@/components/ui/button";
@@ -26,26 +26,28 @@ export default function Header() {
       const smartWallet = user?.linked_accounts.find(
         (account) => account.type === "smart_wallet"
       );
-      if (smartWallet) {
-        const walletAddress = smartWallet.address;
-        const emailAccount = user?.linked_accounts.find(
-          (account) =>
-            account.type === "google_oauth" ||
-            account.type === "email" ||
-            account.type === "apple_oauth"
-        );
-        const email =
-          emailAccount && "email" in emailAccount
-            ? emailAccount.email
-            : undefined;
+      const walletAddress = smartWallet?.address;
+      const emailAccount = user?.linked_accounts.find(
+        (account) =>
+          account.type === "google_oauth" ||
+          account.type === "email" ||
+          account.type === "apple_oauth"
+      );
+      const email =
+        emailAccount && "email" in emailAccount
+          ? emailAccount.email
+          : undefined;
+      if (walletAddress && email) {
         updateWalletAddress(walletAddress);
-        if (email) {
-          await registerUser(walletAddress, email);
-        }
-        await Promise.all([fetchPositionData(), fetchActions(), fetchApy()]);
+        await registerUser(walletAddress, email);
+        await Promise.all([
+          fetchPositionData(),
+          fetchActions(),
+          fetchApy(),
+          fetchCurrencyRate(),
+        ]);
         fetchApyHistory();
         fetchNotification();
-        fetchCurrencyRate();
       }
     };
 

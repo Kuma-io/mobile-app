@@ -1,10 +1,10 @@
-import * as haptics from "expo-haptics";
 import { useCallback, useEffect, useState, useRef } from "react";
 import { Text, TouchableOpacity, View, ActivityIndicator } from "react-native";
 import { LineChart } from "react-native-wagmi-charts";
 import useStore from "@/store/useStore";
 import { triggerHaptic } from "@/utils/haptics";
 import React from "react";
+import { ApyTimeframe } from "@/types";
 
 interface TimeFrameSelectorProps {
   timeFrame: string;
@@ -12,11 +12,11 @@ interface TimeFrameSelectorProps {
 }
 
 // Map UI timeframes to API timeframes
-const timeframeMap: { [key: string]: string } = {
-  "1W": "W",
-  "1M": "M",
+const timeframeMap: { [key: string]: ApyTimeframe } = {
+  "1W": "1W",
+  "1M": "1M",
   "6M": "6M",
-  "1Y": "Y",
+  "1Y": "1Y",
 };
 
 export default function Chart() {
@@ -63,10 +63,10 @@ export default function Chart() {
     // Create chart data points with timestamps
     const now = Date.now();
     const timeframeInDays = {
-      W: 7,
-      M: 30,
+      "1W": 7,
+      "1M": 30,
       "6M": 180,
-      Y: 365,
+      "1Y": 365,
     }[timeframe];
 
     const timestampStep =
@@ -94,7 +94,7 @@ export default function Chart() {
 
   const handleTimeFrameChange = async (newTimeFrame: string) => {
     const apiTimeframe = timeframeMap[newTimeFrame];
-    updateApyTimeframe(apiTimeframe as "W" | "M" | "6M" | "Y");
+    updateApyTimeframe(apiTimeframe as ApyTimeframe);
     setIsLoading(true);
     try {
       await fetchApyHistory();

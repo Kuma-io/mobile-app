@@ -1,29 +1,25 @@
-import * as haptics from "expo-haptics";
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { LineChart } from "react-native-wagmi-charts";
-import useStore, { Timeframe } from "@/store/useStore";
+import useStore from "@/store/useStore";
 import { triggerHaptic } from "@/utils/haptics";
-import { formatYield } from "@/utils/formatYield";
-
+import { UserPositionTimeframe } from "@/types";
 interface TimeFrameSelectorProps {
   timeFrame: string;
   onTimeFrameChange: (timeFrame: string) => void;
 }
 
-// Map UI timeframes to API timeframes
-const timeframeMap: { [key: string]: string } = {
-  "1H": "H",
-  "1D": "D",
-  "1W": "W",
-  "1M": "M",
-  "1Y": "Y",
+const timeframeMap: { [key: string]: UserPositionTimeframe } = {
+  "1H": "1H",
+  "1D": "1D",
+  "1W": "1W",
+  "1M": "1M",
+  MAX: "MAX",
 };
 
 export default function Chart() {
   const {
-    data: { positionData, timeframe, balance },
-    settings: { currencyRate },
+    data: { positionData, timeframe },
     fetchPositionData,
     updateTimeframe,
     updateBalance,
@@ -48,7 +44,7 @@ export default function Chart() {
   }, [positionData]);
 
   // Get the UI timeframe from API timeframe
-  const getUITimeframe = (apiTimeframe: Timeframe) => {
+  const getUITimeframe = (apiTimeframe: UserPositionTimeframe) => {
     return (
       Object.entries(timeframeMap).find(
         ([_, value]) => value === apiTimeframe
@@ -60,7 +56,7 @@ export default function Chart() {
 
   const handleTimeFrameChange = (newTimeFrame: string) => {
     const apiTimeframe = timeframeMap[newTimeFrame];
-    updateTimeframe(apiTimeframe as Timeframe);
+    updateTimeframe(apiTimeframe as UserPositionTimeframe);
     fetchPositionData();
   };
 
@@ -120,7 +116,7 @@ function TimeFrameSelector({
   const timeFrames = ["1H", "1D", "1W", "1M", "MAX"];
 
   return (
-    <View className="pl-8 flex w-[70%] flex-row justify-between">
+    <View className="pl-8 flex w-[55%] flex-row justify-between">
       {timeFrames.map((frame) => (
         <TouchableOpacity
           key={frame}

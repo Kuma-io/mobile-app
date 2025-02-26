@@ -2,17 +2,10 @@ import { Stack } from "expo-router";
 import React, { useState } from "react";
 import { SafeAreaView, ScrollView, View } from "react-native";
 
-import Header from "@/pages/settings/1 - Header";
-import Settings from "@/pages/settings/3 - Settings";
-import Actions from "@/pages/settings/5 - Actions";
-import Account from "@/pages/settings/2 - Account";
-import useStore from "@/store/useStore";
-import CurrencyModal from "@/pages/settings/modal/currency";
+import { Actions, Header, Account, Settings } from "@/pages/settings";
+import { CurrencyModal } from "@/pages/settings/modal";
+
 export default function SettingsPage() {
-  const {
-    settings: { currencySlug, notification },
-    updateNotification,
-  } = useStore();
   const [currencyModal, setCurrencyModal] = useState(false);
   return (
     <>

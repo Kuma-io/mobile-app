@@ -10,26 +10,7 @@ import {
   getUserNotifications,
   getCurrencyRate,
 } from "@/lib/api";
-
-interface UserPosition {
-  timestamp: string;
-  userBalance: string;
-  userPrincipal: string;
-}
-
-interface Action {
-  timestamp: string;
-  action: string;
-  amount: string;
-}
-
-interface ChartData {
-  timestamp: number;
-  value: number;
-}
-
-export type CurrencySlug = "USD" | "EUR" | "GBP";
-export type Timeframe = "H" | "D" | "W" | "M" | "Y";
+import * as types from "@/types";
 
 interface StoreState {
   data: {
@@ -37,16 +18,14 @@ interface StoreState {
     balance: number;
     principal: number;
     yieldValue: number;
-    positionData: ChartData[];
-    actions: Action[];
-    timeframe: Timeframe;
+    positionData: types.ChartData[];
+    actions: types.Action[];
+    timeframe: types.UserPositionTimeframe;
   };
   // Actions
   updateWalletAddress: (walletAddress: string) => void;
   updateBalance: (balance: number) => void;
-  updatePrincipal: (principal: number) => void;
-  updateYieldValue: (yieldValue: number) => void;
-  updateTimeframe: (timeframe: Timeframe) => void;
+  updateTimeframe: (timeframe: types.UserPositionTimeframe) => void;
   fetchPositionData: () => Promise<void>;
   fetchActions: () => Promise<void>;
 
@@ -54,22 +33,22 @@ interface StoreState {
     apy: number;
     apyVariation: number;
     totalSupply: number;
-    timeframe: "W" | "M" | "6M" | "Y";
+    timeframe: types.ApyTimeframe;
     avgApy: number;
     apyHistory: number[];
   };
   fetchApy: () => Promise<void>;
   fetchApyHistory: () => Promise<void>;
-  updateApyTimeframe: (timeframe: "W" | "M" | "6M" | "Y") => void;
+  updateApyTimeframe: (timeframe: types.ApyTimeframe) => void;
   // Settings
   settings: {
-    currencySlug: CurrencySlug;
+    currencySlug: types.CurrencySlug;
     currencyRate: number;
     notification: boolean;
   };
   updateNotification: (notification: boolean) => void;
   fetchNotification: () => Promise<void>;
-  updateCurrencySlug: (currencySlug: CurrencySlug) => void;
+  updateCurrencySlug: (currencySlug: types.CurrencySlug) => void;
   fetchCurrencyRate: () => Promise<void>;
 }
 
@@ -84,7 +63,7 @@ const useStore = create<StoreState>()(
         yieldValue: 0,
         positionData: [],
         actions: [],
-        timeframe: "H" as Timeframe,
+        timeframe: "1H" as types.UserPositionTimeframe,
       },
       updateWalletAddress: (walletAddress: string) =>
         set((state) => ({
@@ -100,21 +79,7 @@ const useStore = create<StoreState>()(
             balance,
           },
         })),
-      updatePrincipal: (principal: number) =>
-        set((state) => ({
-          data: {
-            ...state.data,
-            principal,
-          },
-        })),
-      updateYieldValue: (yieldValue: number) =>
-        set((state) => ({
-          data: {
-            ...state.data,
-            yieldValue,
-          },
-        })),
-      updateTimeframe: (timeframe: Timeframe) =>
+      updateTimeframe: (timeframe: types.UserPositionTimeframe) =>
         set((state) => ({
           data: {
             ...state.data,
@@ -137,12 +102,15 @@ const useStore = create<StoreState>()(
           }
 
           // Transform API data into ChartData format
-          const positionData: ChartData[] = json.userPositions
-            .map((position: UserPosition) => ({
+          const positionData: types.ChartData[] = json.userPositions
+            .map((position: types.UserPosition) => ({
               timestamp: new Date(position.timestamp).getTime(),
               value: parseFloat(position.userBalance),
             }))
-            .sort((a: ChartData, b: ChartData) => a.timestamp - b.timestamp);
+            .sort(
+              (a: types.ChartData, b: types.ChartData) =>
+                a.timestamp - b.timestamp
+            );
           // Get the latest position data
           console.log("positionData", positionData);
           const latestData = json.userPositions[0];
@@ -176,11 +144,13 @@ const useStore = create<StoreState>()(
             return;
           }
 
-          const actions: Action[] = json.userActions.map((action: any) => ({
-            timestamp: action.timestamp,
-            action: action.action,
-            amount: action.amount,
-          }));
+          const actions: types.Action[] = json.userActions.map(
+            (action: any) => ({
+              timestamp: action.timestamp,
+              action: action.action,
+              amount: action.amount,
+            })
+          );
 
           set((state) => ({
             data: {
@@ -198,7 +168,7 @@ const useStore = create<StoreState>()(
         apy: 0,
         apyVariation: 0,
         totalSupply: 0,
-        timeframe: "W" as "W" | "M" | "6M" | "Y",
+        timeframe: "1W" as types.ApyTimeframe,
         avgApy: 0,
         apyHistory: [],
       },
@@ -216,7 +186,7 @@ const useStore = create<StoreState>()(
       fetchApyHistory: async () => {
         const { timeframe } = get().stats;
         console.log("apy history timeframe", timeframe);
-        const json = await getApyHistory(timeframe);
+        const json = await getApyHistory(timeframe as types.ApyTimeframe);
         set((state) => ({
           stats: {
             ...state.stats,
@@ -225,7 +195,7 @@ const useStore = create<StoreState>()(
           },
         }));
       },
-      updateApyTimeframe: (timeframe: "W" | "M" | "6M" | "Y") =>
+      updateApyTimeframe: (timeframe: types.ApyTimeframe) =>
         set((state) => ({
           stats: {
             ...state.stats,
@@ -234,7 +204,7 @@ const useStore = create<StoreState>()(
         })),
       // Settings
       settings: {
-        currencySlug: "USD" as CurrencySlug,
+        currencySlug: "USD" as types.CurrencySlug,
         currencyRate: 1,
         notification: true,
       },
@@ -266,7 +236,7 @@ const useStore = create<StoreState>()(
           },
         }));
       },
-      updateCurrencySlug: (currencySlug: CurrencySlug) => {
+      updateCurrencySlug: (currencySlug: types.CurrencySlug) => {
         set((state) => ({
           settings: {
             ...state.settings,
