@@ -112,7 +112,6 @@ const useStore = create<StoreState>()(
                 a.timestamp - b.timestamp
             );
           // Get the latest position data
-          console.log("positionData", positionData);
           const latestData = json.userPositions[0];
           const principal = parseFloat(latestData.userPrincipal);
           const balance = parseFloat(latestData.userBalance);
@@ -132,6 +131,7 @@ const useStore = create<StoreState>()(
       },
       fetchActions: async () => {
         const { walletAddress } = get().data;
+
         if (!walletAddress) {
           console.error("No wallet address available");
           return;
@@ -185,7 +185,6 @@ const useStore = create<StoreState>()(
       },
       fetchApyHistory: async () => {
         const { timeframe } = get().stats;
-        console.log("apy history timeframe", timeframe);
         const json = await getApyHistory(timeframe as types.ApyTimeframe);
         set((state) => ({
           stats: {
@@ -232,7 +231,7 @@ const useStore = create<StoreState>()(
         set((state) => ({
           settings: {
             ...state.settings,
-            notification: json.notification,
+            notification: json,
           },
         }));
       },

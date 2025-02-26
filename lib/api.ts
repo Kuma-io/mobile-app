@@ -9,6 +9,7 @@ export const registerUser = async (walletAddress: string, email: string) => {
     },
   });
   const json = await response.json();
+  console.log("registerUser", json);
   registerUserPosition(walletAddress);
   return json;
 };
@@ -25,7 +26,7 @@ export const registerUserActions = async (
     },
   });
   const json = await response.json();
-  console.log(json);
+  console.log("registerUserActions", json);
   return json;
 };
 
@@ -37,7 +38,7 @@ export const registerUserPosition = async (walletAddress: string) => {
     },
   });
   const json = await response.json();
-  console.log(json);
+  console.log("registerUserPosition", json);
   return json;
 };
 
@@ -52,6 +53,7 @@ export const registerUserNotification = async (
     },
   });
   const json = await response.json();
+  console.log("registerUserNotification", json);
   return json;
 };
 
@@ -60,16 +62,15 @@ export const getUserPositions = async (
   walletAddress: string,
   timeframe: types.UserPositionTimeframe
 ) => {
-  console.log("timeframe", timeframe);
   const apiUrl = `https://kuma-server.vercel.app/get-user-positions/${walletAddress}/${timeframe}`;
-  console.log("apiUrl", apiUrl);
+  console.log("api", apiUrl);
   const response = await fetch(apiUrl, {
     headers: {
       "x-api-key": "1234567890",
     },
   });
   const json = await response.json();
-  console.log("json", json);
+  console.log("getUserPositions", json);
   return json;
 };
 
@@ -81,7 +82,7 @@ export const getUserActions = async (walletAddress: string) => {
     },
   });
   const json = await response.json();
-  console.log("json", json);
+  console.log("getUserActions", json);
   return json;
 };
 
@@ -93,6 +94,7 @@ export const getUserNotifications = async (walletAddress: string) => {
     },
   });
   const json = await response.json();
+  console.log("getUserNotifications", json);
   return json;
 };
 
@@ -117,6 +119,11 @@ export const getApy = async () => {
   // Calculate variation (difference between newest and last week's average)
   const apyVariation = ((newestRate - lastWeekAvg) / lastWeekAvg) * 100;
 
+  console.log("getApy", {
+    apy: newestRate,
+    apyVariation,
+    totalSupply,
+  });
   return {
     apy: newestRate,
     apyVariation,
@@ -150,8 +157,10 @@ export const getApyHistory = async (timeframe: types.ApyTimeframe) => {
     data.length;
   const rateHistory = data.map((entry: any) => entry.liquidityRate_avg);
 
-  console.log("rateHistory", rateHistory);
-  console.log("avgRate", avgRate);
+  console.log("getApyHistory", {
+    avgRate,
+    rateHistory,
+  });
 
   return {
     avgRate,
@@ -166,6 +175,6 @@ export const getCurrencyRate = async (currencySlug: types.CurrencySlug) => {
   const apiUrl = `https://min-api.cryptocompare.com/data/price?fsym=USDC&tsyms=${currencySlug}&api_key=059fad215d1927895c58d9ec92b3dd995165bfcc8fd797ab2d070d4e10c44c1f`;
   const response = await fetch(apiUrl);
   const json = await response.json();
-
+  console.log("getCurrencyRate", json);
   return json[currencySlug];
 };
