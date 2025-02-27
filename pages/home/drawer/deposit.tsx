@@ -23,7 +23,11 @@ export default function DepositDrawer({
   const [number, setNumber] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const { client } = useSmartWallets();
-  const { fetchPositionData, fetchActions } = useStore();
+  const {
+    fetchPositionData,
+    fetchActions,
+    settings: { currencyRate },
+  } = useStore();
 
   useEffect(() => {
     if (!isVisible) {
@@ -38,7 +42,8 @@ export default function DepositDrawer({
       (async () => {
         try {
           setIsLoading(true);
-          const receipt = await deposit(client, number);
+          const amount = (number / currencyRate).toFixed(6);
+          const receipt = await deposit(client, parseFloat(amount));
           fetchPositionData();
           fetchActions();
           triggerHaptic("success");
