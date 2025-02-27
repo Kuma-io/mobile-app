@@ -32,7 +32,6 @@ export default function WithdrawDrawer({
   }, [isVisible]);
 
   const handleWithdraw = async (): Promise<any> => {
-    triggerHaptic("heavy");
     if (!client || number <= 0) return;
 
     return toast.promise(

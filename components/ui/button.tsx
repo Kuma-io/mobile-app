@@ -1,6 +1,6 @@
-import * as Haptics from "expo-haptics";
 import { useRef, useState } from "react";
 import { Animated, Pressable, StyleSheet } from "react-native";
+import { triggerHaptic } from "@/utils/haptics";
 
 interface ButtonProps {
   children: React.ReactNode;
@@ -50,9 +50,9 @@ export function Button({
       disabled={disabled}
       onPressIn={() => {
         animatePress(true);
+        triggerHaptic("medium");
       }}
       onPressOut={() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
         animatePress(false);
       }}
       onPress={onPress}

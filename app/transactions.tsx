@@ -2,6 +2,7 @@ import { router, Stack } from "expo-router";
 import React from "react";
 import { SafeAreaView, ScrollView, View, Text } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { triggerHaptic } from "@/utils/haptics";
 
 import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react-native";
@@ -49,6 +50,7 @@ const Actions = () => {
       <Button
         onPress={() => {
           router.back();
+          triggerHaptic("light");
         }}
         noShadow
         className="flex-row items-center justify-around aspect-square h-14"

@@ -32,7 +32,6 @@ export default function DepositDrawer({
   }, [isVisible]);
 
   const handleDeposit = async (): Promise<any> => {
-    triggerHaptic("heavy");
     if (!client || number <= 0) return;
 
     return toast.promise(

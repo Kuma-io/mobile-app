@@ -5,6 +5,7 @@ import { Text, View } from "react-native";
 import { Button } from "@/components/ui/button";
 import Drawer from "@/components/ui/drawer";
 import useStore from "@/store/useStore";
+import { triggerHaptic } from "@/utils/haptics";
 
 export default function CurrencyModal({
   isVisible,
@@ -21,7 +22,7 @@ export default function CurrencyModal({
       style={{ height: "auto" }}
     >
       <Header />
-      <SelectCurrency />
+      <SelectCurrency onClose={onClose} />
     </Drawer>
   );
 }
@@ -42,7 +43,7 @@ const CURRENCIES = [
   { slug: "GBP", Icon: PoundSterling },
 ] as const;
 
-const SelectCurrency = () => {
+const SelectCurrency = ({ onClose }: { onClose: () => void }) => {
   const {
     updateCurrencySlug,
     settings: { currencySlug },
@@ -53,7 +54,11 @@ const SelectCurrency = () => {
       {CURRENCIES.map(({ slug, Icon }) => (
         <Button
           key={slug}
-          onPress={() => updateCurrencySlug(slug)}
+          onPress={() => {
+            updateCurrencySlug(slug);
+            triggerHaptic("success");
+            onClose();
+          }}
           noShadow
           className="w-full flex-row items-center justify-between py-2 px-4"
         >

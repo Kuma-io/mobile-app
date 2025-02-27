@@ -34,9 +34,10 @@ export default function Header() {
           account.type === "apple_oauth"
       );
       const email =
-        emailAccount && "email" in emailAccount
-          ? emailAccount.email
-          : undefined;
+        emailAccount?.type === "email"
+          ? emailAccount.address
+          : emailAccount?.email;
+      console.log(walletAddress, emailAccount);
       if (walletAddress && email) {
         updateWalletAddress(walletAddress);
         await registerUser(walletAddress, email);

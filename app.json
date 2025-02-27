@@ -16,11 +16,15 @@
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "bundleIdentifier": "com.test.kuma",
-      "associatedDomains": ["webcredentials:<your-associated-domain>"],
+      "associatedDomains": [
+        "webcredentials:<your-associated-domain>",
+        "webcredentials:<your-associated-domain>"
+      ],
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
-        }
+        },
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -28,7 +32,11 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.test.kuma"
+      "package": "com.test.kuma",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -38,7 +46,13 @@
     "extra": {
       "privyAppId": "clu7m7ye30hjzey4dp7byyvok",
       "privyClientId": "client-WY2jPdxGstKyN1bAmgECTcjE873iTVGiEskRBgZyf6Hir",
-      "passkeyAssociatedDomain": "https://<your-associated-domain>"
+      "passkeyAssociatedDomain": "https://<your-associated-domain>",
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "3c2594cc-f1a0-4c5c-8522-68716ad0394a"
+      }
     },
     "plugins": [
       "expo-router",

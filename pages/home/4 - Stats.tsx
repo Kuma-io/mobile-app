@@ -4,6 +4,7 @@ import { Pressable, Text, View } from "react-native";
 import { formatYield } from "@/utils/formatYield";
 import { router } from "expo-router";
 import { CurrencySign } from "@/types/currency";
+import { triggerHaptic } from "@/utils/haptics";
 
 export default function Stats() {
   return (
@@ -13,6 +14,7 @@ export default function Stats() {
         <Pressable
           onPress={() => {
             router.push("/stats");
+            triggerHaptic("light");
           }}
         >
           <Text className="font-sans-black text-sm">More</Text>

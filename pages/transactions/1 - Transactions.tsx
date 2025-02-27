@@ -60,7 +60,7 @@ export default function Transactions() {
         >
           <View className="flex-row items-center justify-between w-full">
             <Text className="font-sans-bold text-sm text-gray-400">
-              {formatDate(day).toUpperCase()}
+              {formatDate(day)}
             </Text>
           </View>
           <View className="w-full border-2 border-black rounded-2xl">
@@ -89,7 +89,8 @@ export default function Transactions() {
                   </View>
                   <View className="flex-col items-start justify-center">
                     <Text className="font-sans-bold text-lg">
-                      {item.action.toUpperCase()}
+                      {item.action[0].toUpperCase() +
+                        item.action.slice(1).toLowerCase()}
                     </Text>
                     <Text className="font-sans-medium text-xs text-gray-400">
                       {new Date(item.timestamp).toLocaleTimeString([], {
@@ -99,7 +100,7 @@ export default function Transactions() {
                     </Text>
                   </View>
                 </View>
-                <Text className="font-sans-bold text-xl">
+                <Text className="font-sans-bold text-lg">
                   {item.action.toLowerCase() === "withdraw" ? "-" : ""}
                   {`${(Number(item.amount) * currencyRate).toFixed(
                     item.action.toLowerCase() === "rewards" ? 6 : 2

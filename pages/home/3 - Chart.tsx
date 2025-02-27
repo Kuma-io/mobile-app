@@ -116,7 +116,7 @@ function TimeFrameSelector({
   const timeFrames = ["1H", "1D", "1W", "1M", "MAX"];
 
   return (
-    <View className="pl-8 flex w-[55%] flex-row justify-between">
+    <View className="pl-8 flex w-[65%] flex-row justify-between">
       {timeFrames.map((frame) => (
         <TouchableOpacity
           key={frame}

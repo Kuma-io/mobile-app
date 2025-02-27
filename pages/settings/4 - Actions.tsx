@@ -3,12 +3,16 @@ import { router } from "expo-router";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import { Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import useStore from "@/store/useStore";
 
 import { Button } from "@/components/ui/button";
+import { triggerHaptic } from "@/utils/haptics";
+import { toast } from "sonner-native";
 
 export default function Actions() {
   const insets = useSafeAreaInsets();
   const { logout } = usePrivy();
+  const reset = useStore((state) => state.reset);
   return (
     <View
       style={{
@@ -32,13 +36,15 @@ export default function Actions() {
       </Button>
       <Button
         onPress={async () => {
-          await logout();
-          router.replace({
-            pathname: "/",
-            params: {
-              animation: "none",
-            },
-          });
+          try {
+            await logout();
+            reset();
+            router.replace("/");
+            triggerHaptic("error");
+            toast.success("Logged out");
+          } catch (error) {
+            toast.error("Error logging out");
+          }
         }}
         className="h-16 w-[35vw] flex-row items-center justify-around bg-red-500/90 pl-1"
       >

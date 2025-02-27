@@ -11,7 +11,8 @@ import {
   getCurrencyRate,
 } from "@/lib/api";
 import * as types from "@/types";
-
+import { toast } from "sonner-native";
+import { triggerHaptic } from "@/utils/haptics";
 interface StoreState {
   data: {
     walletAddress: string | null;
@@ -28,6 +29,7 @@ interface StoreState {
   updateTimeframe: (timeframe: types.UserPositionTimeframe) => void;
   fetchPositionData: () => Promise<void>;
   fetchActions: () => Promise<void>;
+  reset: () => void;
 
   stats: {
     apy: number;
@@ -213,13 +215,19 @@ const useStore = create<StoreState>()(
           console.error("No wallet address available");
           return;
         }
-        registerUserNotification(walletAddress, notification);
-        set((state) => ({
-          settings: {
-            ...state.settings,
-            notification,
-          },
-        }));
+        try {
+          await registerUserNotification(walletAddress, notification);
+          toast.success("Notification turned " + (notification ? "on" : "off"));
+          triggerHaptic("success");
+          set((state) => ({
+            settings: {
+              ...state.settings,
+              notification,
+            },
+          }));
+        } catch (error) {
+          toast.error("Error updating notification");
+        }
       },
       fetchNotification: async () => {
         const { walletAddress } = get().data;
@@ -236,6 +244,8 @@ const useStore = create<StoreState>()(
         }));
       },
       updateCurrencySlug: (currencySlug: types.CurrencySlug) => {
+        toast.success("Currency updated to " + currencySlug);
+        triggerHaptic("success");
         set((state) => ({
           settings: {
             ...state.settings,
@@ -254,6 +264,31 @@ const useStore = create<StoreState>()(
           },
         }));
       },
+      reset: () =>
+        set((state) => ({
+          data: {
+            walletAddress: null,
+            balance: 0,
+            principal: 0,
+            yieldValue: 0,
+            positionData: [],
+            actions: [],
+            timeframe: "1H" as types.UserPositionTimeframe,
+          },
+          stats: {
+            apy: 0,
+            apyVariation: 0,
+            totalSupply: 0,
+            timeframe: "1W" as types.ApyTimeframe,
+            avgApy: 0,
+            apyHistory: [],
+          },
+          settings: {
+            currencySlug: "USD" as types.CurrencySlug,
+            currencyRate: 1,
+            notification: true,
+          },
+        })),
     }),
     {
       name: "app-storage",

@@ -32,7 +32,6 @@ export default function LoginDrawer({
   const inputRef = useRef<TextInput>(null);
   const { state, sendCode, loginWithCode } = useLoginWithEmail({
     onSendCodeSuccess: ({ email }) => {
-      triggerHaptic("light");
       toast.success(`OTP sent to ${email}`);
     },
     onLoginSuccess: (user) => {
