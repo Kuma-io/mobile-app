@@ -52,8 +52,8 @@ function AppContent() {
 export default function RootLayout() {
   return (
     <PrivyProvider
-      appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID as string}
-      clientId={process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID as string}
+      appId={"clu7m7ye30hjzey4dp7byyvok"}
+      clientId={"client-WY2jPdxGstKyN1bAmgECTcjE873iTVGiEskRBgZyf6Hir"}
     >
       <SmartWalletsProvider>
         <AppContent />
