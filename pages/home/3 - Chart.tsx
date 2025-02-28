@@ -102,6 +102,24 @@ export default function Chart() {
             }}
           >
             {/* <LineChart.Tooltip cursorGutter={60} xGutter={16} yGutter={0} /> */}
+            <LineChart.Tooltip cursorGutter={50} xGutter={20} yGutter={20}>
+              <LineChart.DatetimeText
+                format={({ value }) => {
+                  "worklet";
+                  const date = new Date(value);
+                  if (timeFrame === "1H" || timeFrame === "1D") {
+                    return date.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    });
+                  }
+                  return date.toLocaleDateString([], {
+                    month: "short",
+                    day: "numeric",
+                  });
+                }}
+              />
+            </LineChart.Tooltip>
           </LineChart.CursorCrosshair>
         </LineChart>
       </LineChart.Provider>

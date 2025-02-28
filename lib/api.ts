@@ -10,7 +10,6 @@ export const registerUser = async (walletAddress: string, email: string) => {
   });
   const json = await response.json();
   console.log("registerUser", json);
-  registerUserPosition(walletAddress);
   return json;
 };
 

@@ -47,7 +47,6 @@ export default function Header() {
           fetchApy(),
           fetchCurrencyRate(),
         ]);
-        fetchApyHistory();
         fetchNotification();
       }
     };
