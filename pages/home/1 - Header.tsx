@@ -15,9 +15,9 @@ export default function Header() {
     fetchPositionData,
     fetchActions,
     fetchApy,
-    fetchApyHistory,
     fetchNotification,
     fetchCurrencyRate,
+    updateEmail,
   } = useStore();
   const wallet = useEmbeddedWallet();
 
@@ -40,6 +40,7 @@ export default function Header() {
       console.log(walletAddress, emailAccount);
       if (walletAddress && email) {
         updateWalletAddress(walletAddress);
+        updateEmail(email);
         await registerUser(walletAddress, email);
         await Promise.all([
           fetchPositionData(),

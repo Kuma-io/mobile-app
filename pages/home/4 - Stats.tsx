@@ -64,7 +64,7 @@ const Rewards = () => {
     <View className="h-24 flex-1 items-center justify-center rounded-2xl bg-black">
       <View className="items-start flex-1 justify-around p-4 pt-3 pl-6">
         <Text className="font-sans-medium text-sm text-gray-400">
-          Profit Made
+          Total Rewards
         </Text>
         <Text className="font-sans-bold text-3xl text-white">
           {(() => {

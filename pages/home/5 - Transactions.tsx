@@ -66,7 +66,8 @@ export default function Activity() {
                 </View>
                 <View className="flex-col items-start justify-center">
                   <Text className="font-sans-bold text-lg">
-                    {item.action.toUpperCase()}
+                    {item.action[0].toUpperCase() +
+                      item.action.slice(1).toLowerCase()}
                   </Text>
                   <Text className="font-sans-medium text-xs text-gray-400">
                     {new Date(item.timestamp).toLocaleTimeString([], {

@@ -1,61 +1,5 @@
 import * as types from "@/types";
 
-// POST
-export const registerUser = async (walletAddress: string, email: string) => {
-  const apiUrl = `https://kuma-server.vercel.app/register-user/${walletAddress}/${email}`;
-  const response = await fetch(apiUrl, {
-    headers: {
-      "x-api-key": "1234567890",
-    },
-  });
-  const json = await response.json();
-  console.log("registerUser", json);
-  return json;
-};
-
-export const registerUserActions = async (
-  walletAddress: string,
-  action: "DEPOSIT" | "WITHDRAW",
-  amount: number
-) => {
-  const apiUrl = `https://kuma-server.vercel.app/register-user-action/${walletAddress}/${action}/${amount}`;
-  const response = await fetch(apiUrl, {
-    headers: {
-      "x-api-key": "1234567890",
-    },
-  });
-  const json = await response.json();
-  console.log("registerUserActions", json);
-  return json;
-};
-
-export const registerUserPosition = async (walletAddress: string) => {
-  const apiUrl = `https://kuma-server.vercel.app/register-user-position/${walletAddress}`;
-  const response = await fetch(apiUrl, {
-    headers: {
-      "x-api-key": "1234567890",
-    },
-  });
-  const json = await response.json();
-  console.log("registerUserPosition", json);
-  return json;
-};
-
-export const registerUserNotification = async (
-  walletAddress: string,
-  notification: boolean
-) => {
-  const apiUrl = `https://kuma-server.vercel.app/register-user-notification/${walletAddress}/${notification}`;
-  const response = await fetch(apiUrl, {
-    headers: {
-      "x-api-key": "1234567890",
-    },
-  });
-  const json = await response.json();
-  console.log("registerUserNotification", json);
-  return json;
-};
-
 // GET
 export const getUserPositions = async (
   walletAddress: string,
@@ -171,9 +115,65 @@ export const getCurrencyRate = async (currencySlug: types.CurrencySlug) => {
   if (currencySlug === "USD") {
     return 1;
   }
-  const apiUrl = `https://min-api.cryptocompare.com/data/price?fsym=USDC&tsyms=${currencySlug}&api_key=059fad215d1927895c58d9ec92b3dd995165bfcc8fd797ab2d070d4e10c44c1f`;
+  const apiUrl = `https://min-api.cryptocompare.com/data/price?fsym=USD&tsyms=${currencySlug}&api_key=059fad215d1927895c58d9ec92b3dd995165bfcc8fd797ab2d070d4e10c44c1f`;
   const response = await fetch(apiUrl);
   const json = await response.json();
   console.log("getCurrencyRate", json);
   return json[currencySlug];
+};
+
+// POST
+export const registerUser = async (walletAddress: string, email: string) => {
+  const apiUrl = `https://kuma-server.vercel.app/register-user/${walletAddress}/${email}`;
+  const response = await fetch(apiUrl, {
+    headers: {
+      "x-api-key": "1234567890",
+    },
+  });
+  const json = await response.json();
+  console.log("registerUser", json);
+  return json;
+};
+
+export const registerUserActions = async (
+  walletAddress: string,
+  action: "DEPOSIT" | "WITHDRAW",
+  amount: number
+) => {
+  const apiUrl = `https://kuma-server.vercel.app/register-user-action/${walletAddress}/${action}/${amount}`;
+  const response = await fetch(apiUrl, {
+    headers: {
+      "x-api-key": "1234567890",
+    },
+  });
+  const json = await response.json();
+  console.log("registerUserActions", json);
+  return json;
+};
+
+export const registerUserPosition = async (walletAddress: string) => {
+  const apiUrl = `https://kuma-server.vercel.app/register-user-position/${walletAddress}`;
+  const response = await fetch(apiUrl, {
+    headers: {
+      "x-api-key": "1234567890",
+    },
+  });
+  const json = await response.json();
+  console.log("registerUserPosition", json);
+  return json;
+};
+
+export const registerUserNotification = async (
+  walletAddress: string,
+  notification: boolean
+) => {
+  const apiUrl = `https://kuma-server.vercel.app/register-user-notification/${walletAddress}/${notification}`;
+  const response = await fetch(apiUrl, {
+    headers: {
+      "x-api-key": "1234567890",
+    },
+  });
+  const json = await response.json();
+  console.log("registerUserNotification", json);
+  return json;
 };

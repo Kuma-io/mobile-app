@@ -102,7 +102,7 @@ export default function Chart() {
             }}
           >
             {/* <LineChart.Tooltip cursorGutter={60} xGutter={16} yGutter={0} /> */}
-            <LineChart.Tooltip cursorGutter={50} xGutter={20} yGutter={20}>
+            <LineChart.Tooltip cursorGutter={50} xGutter={30} yGutter={30}>
               <LineChart.DatetimeText
                 format={({ value }) => {
                   "worklet";

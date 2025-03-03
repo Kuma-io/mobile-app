@@ -1,9 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Text, View, Linking } from "react-native";
 import Drawer from "@/components/ui/drawer";
 import { useMoonPaySdk } from "@moonpay/react-native-moonpay-sdk";
 import * as WebBrowser from "expo-web-browser";
 import { Button } from "@/components/ui/button";
+import useStore from "@/store/useStore";
+import { ChevronRight } from "lucide-react-native";
+import { NumPad } from "@/components/ui/numpad";
+import { NumScreen } from "@/components/ui/numscreen";
+import { useSmartWallets } from "@privy-io/expo/smart-wallets";
 
 const MOONPAY_API_KEY = "pk_test_lhO0wUX5sQ5aKsEIIj7P3j7z15jwPPzL";
 
@@ -14,13 +19,40 @@ export default function OnRampDrawer({
   isVisible: boolean;
   onClose: () => void;
 }) {
+  const [number, setNumber] = useState<number>(10);
+  const [isLoading, setIsLoading] = useState(false);
+  const { client } = useSmartWallets();
+  const {
+    fetchPositionData,
+    fetchActions,
+    settings: { currencyRate },
+  } = useStore();
+
+  useEffect(() => {
+    if (!isVisible) {
+      setNumber(0);
+    }
+  }, [isVisible]);
+
+  const { data, settings } = useStore();
   const { openWithInAppBrowser, generateUrlForSigning, updateSignature } =
     useMoonPaySdk({
       sdkConfig: {
         flow: "buy",
         environment: "sandbox",
         params: {
-          apiKey: "pk_test_lhO0wUX5sQ5aKsEIIj7P3j7z15jwPPzL",
+          apiKey: MOONPAY_API_KEY,
+          currencyCode: "eth",
+          lockAmount: "true",
+          baseCurrencyAmount: number.toString(),
+          baseCurrencyCode: settings.currencySlug,
+          email: data.email,
+          walletAddress: data.walletAddress!,
+        },
+        handlers: {
+          onAuthToken: async (token) => {
+            console.log("token", token);
+          },
         },
       },
       browserOpener: {
@@ -30,34 +62,65 @@ export default function OnRampDrawer({
       },
     });
 
-  // useEffect(() => {
-  //   // The URL for signature should be sent to your backend, which should then
-  //   // sign it with your API secret and return the signature.
-  //   // Once you have the signature, you can update the SDK with it and show the widget.
-  //   fetch("/sign-url", {
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       Authorization: "Bearer <token>",
-  //     },
-  //     method: "POST",
-  //     body: JSON.stringify({
-  //       url: generateUrlForSigning({ variant: WidgetVariant.Buy }),
-  //     }),
-  //   })
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       const signature = data.signature;
-  //       updateSignature(signature);
-  //     });
-  // }, []);
+  const fetchSignature = async () => {
+    const apiUrl = `https://kuma-server.vercel.app/sign-moonpay`;
+    const response = await fetch(apiUrl, {
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": "1234567890",
+      },
+      method: "POST",
+      body: JSON.stringify({
+        url: generateUrlForSigning({ variant: "inapp-browser" }),
+      }),
+    });
+    const data = await response.json();
+    console.log("signature", data.signature);
+    updateSignature(data.signature);
+  };
+
+  useEffect(() => {
+    fetchSignature();
+  }, [number]);
 
   return (
     <Drawer isVisible={isVisible} onClose={onClose} isBlack>
-      <View className="flex-1 items-center justify-center">
-        <Button onPress={() => openWithInAppBrowser()} isWhite>
-          <Text>Open in InApp browser</Text>
-        </Button>
-      </View>
+      <Header />
+      <NumScreen number={number} />
+      <NumPad setNumber={setNumber} allowDecimals maxValue={999999.99} />
+      <Actions isLoading={isLoading} onDeposit={openWithInAppBrowser} />
     </Drawer>
   );
 }
+
+const Header = () => {
+  return (
+    <View className="w-full flex-row items-center justify-between">
+      <Text className="font-sans-extrabold pl-2 text-3xl text-white/80">
+        Deposit
+      </Text>
+    </View>
+  );
+};
+
+const Actions = ({
+  isLoading,
+  onDeposit,
+}: {
+  isLoading: boolean;
+  onDeposit: () => Promise<void>;
+}) => {
+  return (
+    <View className="w-full flex-row items-center justify-end py-4">
+      <Button
+        onPress={onDeposit}
+        isWhite
+        disabled={isLoading}
+        className="h-14 w-[35vw] flex-row items-center justify-around pl-1"
+      >
+        <Text className="font-sans-extrabold text-lg">Deposit</Text>
+        <ChevronRight size={24} color="black" />
+      </Button>
+    </View>
+  );
+};

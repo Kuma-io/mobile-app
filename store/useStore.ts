@@ -22,9 +22,11 @@ interface StoreState {
     positionData: types.ChartData[];
     actions: types.Action[];
     timeframe: types.UserPositionTimeframe;
+    email: string;
   };
   // Actions
   updateWalletAddress: (walletAddress: string) => void;
+  updateEmail: (email: string) => void;
   updateBalance: (balance: number) => void;
   updateTimeframe: (timeframe: types.UserPositionTimeframe) => void;
   fetchPositionData: () => Promise<void>;
@@ -60,6 +62,7 @@ const useStore = create<StoreState>()(
       // Data
       data: {
         walletAddress: null,
+        email: "",
         balance: 0,
         principal: 0,
         yieldValue: 0,
@@ -72,6 +75,13 @@ const useStore = create<StoreState>()(
           data: {
             ...state.data,
             walletAddress,
+          },
+        })),
+      updateEmail: (email: string) =>
+        set((state) => ({
+          data: {
+            ...state.data,
+            email,
           },
         })),
       updateBalance: (balance: number) =>
@@ -268,6 +278,7 @@ const useStore = create<StoreState>()(
         set((state) => ({
           data: {
             walletAddress: null,
+            email: "",
             balance: 0,
             principal: 0,
             yieldValue: 0,

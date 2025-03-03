@@ -1,18 +1,12 @@
 import { View, Text } from "react-native";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, UserRound, Wallet } from "lucide-react-native";
-import { usePrivy } from "@privy-io/expo";
 import useStore from "@/store/useStore";
 
 export default function Account() {
-  const { user } = usePrivy();
   const {
-    data: { walletAddress },
+    data: { walletAddress, email },
   } = useStore();
-
-  const emailAccount = user?.linked_accounts.find(
-    (account) => account.type === "email" || account.type === "google_oauth"
-  );
   return (
     <View className="w-full items-start justify-center px-8">
       <Text className="mb-2 font-sans-extrabold text-xl">Account</Text>
@@ -26,9 +20,7 @@ export default function Account() {
           <View className="flex-col items-start justify-center">
             <Text className="font-sans-extrabold text-lg">Email</Text>
             <Text className="font-sans-thin text-sm text-gray-600">
-              {emailAccount?.type === "email"
-                ? emailAccount.address
-                : emailAccount?.email}
+              {email}
             </Text>
           </View>
         </View>

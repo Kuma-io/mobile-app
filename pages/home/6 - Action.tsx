@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "@/components/ui/button";
 import DepositDrawer from "./drawer/deposit";
 import WithdrawDrawer from "./drawer/withdraw";
-import OnRampDrawer from "./drawer/on-ramp";
+import OnRampDrawer from "./drawer/deposit/deposit";
 
 export default function ActionPage() {
   const insets = useSafeAreaInsets();
