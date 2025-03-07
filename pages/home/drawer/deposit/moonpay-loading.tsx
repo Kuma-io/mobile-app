@@ -33,11 +33,9 @@ export default function MoonpayLoading({
         handlers: {
           onTransactionCreated: async () => {
             console.log("onTransactionCreated");
-            onOpen();
           },
           onTransactionCompleted: async () => {
             console.log("onTransactionCompleted");
-            onOpen();
           },
         },
       },

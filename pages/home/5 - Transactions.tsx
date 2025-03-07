@@ -9,6 +9,7 @@ import {
 import { router } from "expo-router";
 import { CurrencySign } from "@/types/currency";
 import { triggerHaptic } from "@/utils/haptics";
+import { getRelativeTimeGroup } from "@/utils/getRelativeTimeGroup";
 
 export default function Activity() {
   const {
@@ -70,10 +71,8 @@ export default function Activity() {
                       item.action.slice(1).toLowerCase()}
                   </Text>
                   <Text className="font-sans-medium text-xs text-gray-400">
+                    {getRelativeTimeGroup(new Date(item.timestamp))} at{" "}
                     {new Date(item.timestamp).toLocaleTimeString([], {
-                      weekday: "short",
-                      month: "short",
-                      day: "2-digit",
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
