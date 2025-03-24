@@ -8,6 +8,31 @@ import { ChevronLeft, ChevronRight } from "lucide-react-native";
 
 const MOONPAY_API_KEY = "pk_test_lhO0wUX5sQ5aKsEIIj7P3j7z15jwPPzL";
 
+type OnInitiateDepositProps = {
+  transactionId: string;
+  cryptoCurrency: {
+    id: string;
+    name: string;
+    code: string;
+    contractAddress: string | null;
+    chainId: string | null;
+    coinType: string | null;
+    networkCode: string | null;
+  };
+  fiatCurrency: {
+    id: string;
+    name: string;
+    code: string;
+  };
+  /** Crypto amount in its base unit (0.123 ETH === "0.123") */
+  cryptoCurrencyAmount: string;
+  /** Crypto amount in its smallest unit (1 ETH === 1x10^18) */
+  cryptoCurrencyAmountSmallestDenomination: string;
+  /** Fiat amount in its base unit ($1.23 === "1.23"). Only set for fixed quotes. */
+  fiatCurrencyAmount: string | null;
+  depositWalletAddress: string;
+};
+
 export default function MoonpayLoading({
   amount,
   onOpen,
@@ -31,12 +56,40 @@ export default function MoonpayLoading({
           walletAddress: data.walletAddress!,
         },
         handlers: {
-          onTransactionCreated: async () => {
-            console.log("onTransactionCreated");
+          async onInitiateDeposit(properties: OnInitiateDepositProps) {
+            // Your own crypto deposit code
+            const {
+              cryptoCurrency,
+              cryptoCurrencyAmount,
+              depositWalletAddress,
+            } = properties;
+            const depositId = await deposit(
+              cryptoCurrency.code,
+              cryptoCurrencyAmount,
+              depositWalletAddress
+            );
+            return { depositId };
           },
-          onTransactionCompleted: async () => {
-            console.log("onTransactionCompleted");
-          },
+          // onClose: async () => {
+          //   console.log("Moonpay closed");
+          //   // Handle widget closure
+          //   // You can add navigation or state updates here
+          // },
+          // onLogin: async ({ isRefresh }) => {
+          //   console.log("Moonpay login", { isRefresh });
+          //   // Handle login/refresh
+          //   // isRefresh indicates if this is a token refresh rather than new login
+          // },
+          // onTransactionCreated: async (props) => {
+          //   console.log("Moonpay transaction created", props);
+          //   // Handle transaction creation
+          //   // props contains transaction details like id, status, amounts
+          // },
+          // onTransactionCompleted: async (props) => {
+          //   console.log("Moonpay transaction completed", props);
+          //   // Handle transaction completion
+          //   // props contains full transaction details including fees, amounts, status
+          // },
         },
       },
       browserOpener: {
@@ -96,8 +149,10 @@ const Actions = ({
         <ChevronLeft size={24} color="white" />
       </Button>
       <Pressable
-        onPress={openWithInAppBrowser}
-        className="flex-row items-center justify-center h-14 bg-slate-600/40 flex-1 rounded-2xl bg-white"
+        onPress={() => {
+          openWithInAppBrowser();
+        }}
+        className="flex-row items-center justify-center h-14 flex-1 rounded-2xl bg-white"
       >
         <Text className="font-sans-extrabold text-lg">Buy</Text>
       </Pressable>

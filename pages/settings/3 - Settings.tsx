@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight, BellDot, BadgeEuro } from "lucide-react-native";
 import useStore from "@/store/useStore";
 import ToggleSwitch from "toggle-switch-react-native";
-
+import { toast } from "sonner-native";
 export default function Settings({
   currencyModal,
   setCurrencyModal,
@@ -56,7 +56,14 @@ export default function Settings({
             onColor="#000"
             offColor="#d1d5db"
             size="small"
-            onToggle={() => updateNotification(!notification)}
+            onToggle={() =>
+              toast.promise(updateNotification(!notification), {
+                loading: "Updating notification",
+                success: (result) =>
+                  "Notification updated " + (result ? "on" : "off"),
+                error: "Error updating notification",
+              })
+            }
           />
         </View>
       </Button>

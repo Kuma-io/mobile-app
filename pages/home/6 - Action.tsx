@@ -48,7 +48,7 @@ export default function ActionPage() {
           </Text>
           <ChevronRight size={24} color="white" />
         </Button>
-        {/* <Button
+        <Button
           onPress={() => {
             setIsOnRampModalVisible(true);
           }}
@@ -58,7 +58,7 @@ export default function ActionPage() {
             On Ramp
           </Text>
           <ChevronRight size={24} color="white" />
-        </Button> */}
+        </Button>
       </View>
       <WithdrawDrawer
         isVisible={isWithdrawModalVisible}

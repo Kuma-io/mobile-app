@@ -50,7 +50,7 @@ interface StoreState {
     currencyRate: number;
     notification: boolean;
   };
-  updateNotification: (notification: boolean) => void;
+  updateNotification: (notification: boolean) => Promise<void>;
   fetchNotification: () => Promise<void>;
   updateCurrencySlug: (currencySlug: types.CurrencySlug) => void;
   fetchCurrencyRate: () => Promise<void>;
@@ -227,7 +227,7 @@ const useStore = create<StoreState>()(
         }
         try {
           await registerUserNotification(walletAddress, notification);
-          toast.success("Notification turned " + (notification ? "on" : "off"));
+
           triggerHaptic("success");
           set((state) => ({
             settings: {
@@ -236,7 +236,7 @@ const useStore = create<StoreState>()(
             },
           }));
         } catch (error) {
-          toast.error("Error updating notification");
+          console.error("Error updating notification", error);
         }
       },
       fetchNotification: async () => {

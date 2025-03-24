@@ -4,7 +4,12 @@ export const getRelativeTimeGroup = (date: Date): string => {
     (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
   );
   const diffInWeeks = Math.floor(diffInDays / 7);
-  const diffInMonths = Math.floor(diffInDays / 30);
+
+  // Calculate months more accurately
+  const diffInMonths =
+    (now.getFullYear() - date.getFullYear()) * 12 +
+    (now.getMonth() - date.getMonth());
+
   const diffInYears = Math.floor(diffInDays / 365);
 
   if (diffInDays === 0) return "Today";
