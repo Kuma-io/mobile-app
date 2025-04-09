@@ -1,10 +1,22 @@
 import * as types from "@/types";
 
+// Cache for API responses
+const apiCache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_TTL = 1000 * 60 * 60; // 1 hour cache
+
 // GET
 export const getUserPositions = async (
   walletAddress: string,
   timeframe: types.UserPositionTimeframe
 ) => {
+  const cacheKey = `getUserPositions-${walletAddress}-${timeframe}`;
+  const cached = apiCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    console.log("Cache hit for getUserPositions");
+    return cached.data;
+  }
+
   const apiUrl = `https://kuma-server.vercel.app/get-user-positions/${walletAddress}/${timeframe}`;
   console.log("api", apiUrl);
   const response = await fetch(apiUrl, {
@@ -14,10 +26,24 @@ export const getUserPositions = async (
   });
   const json = await response.json();
   console.log("getUserPositions", json);
+
+  apiCache.set(cacheKey, {
+    data: json,
+    timestamp: Date.now(),
+  });
+
   return json;
 };
 
 export const getUserActions = async (walletAddress: string) => {
+  const cacheKey = `getUserActions-${walletAddress}`;
+  const cached = apiCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    console.log("Cache hit for getUserActions");
+    return cached.data;
+  }
+
   const apiUrl = `https://kuma-server.vercel.app/get-user-actions/${walletAddress}`;
   const response = await fetch(apiUrl, {
     headers: {
@@ -26,10 +52,24 @@ export const getUserActions = async (walletAddress: string) => {
   });
   const json = await response.json();
   console.log("getUserActions", json);
+
+  apiCache.set(cacheKey, {
+    data: json,
+    timestamp: Date.now(),
+  });
+
   return json;
 };
 
 export const getUserNotifications = async (walletAddress: string) => {
+  const cacheKey = `getUserNotifications-${walletAddress}`;
+  const cached = apiCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    console.log("Cache hit for getUserNotifications");
+    return cached.data;
+  }
+
   const apiUrl = `https://kuma-server.vercel.app/get-user-notification/${walletAddress}`;
   const response = await fetch(apiUrl, {
     headers: {
@@ -38,10 +78,24 @@ export const getUserNotifications = async (walletAddress: string) => {
   });
   const json = await response.json();
   console.log("getUserNotifications", json);
+
+  apiCache.set(cacheKey, {
+    data: json,
+    timestamp: Date.now(),
+  });
+
   return json;
 };
 
 export const getApy = async () => {
+  const cacheKey = "getApy";
+  const cached = apiCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    console.log("Cache hit for getApy");
+    return cached.data;
+  }
+
   const timestamp7Days = Math.floor(Date.now() / 1000) - 7 * 86400;
   const apiUrl = `https://aave-api-v2.aave.com/data/rates-history?reserveId=0x833589fcd6edb6e08f4c7c32d4f71b54bda029130xe20fCBdBfFC4Dd138cE8b2E6FBb6CB49777ad64D8453&from=${timestamp7Days}&resolutionInHours=6`;
 
@@ -62,19 +116,31 @@ export const getApy = async () => {
   // Calculate variation (difference between newest and last week's average)
   const apyVariation = ((newestRate - lastWeekAvg) / lastWeekAvg) * 100;
 
-  console.log("getApy", {
-    apy: newestRate,
-    apyVariation,
-    totalSupply,
-  });
-  return {
+  const result = {
     apy: newestRate,
     apyVariation,
     totalSupply,
   };
+
+  console.log("getApy", result);
+
+  apiCache.set(cacheKey, {
+    data: result,
+    timestamp: Date.now(),
+  });
+
+  return result;
 };
 
 export const getApyHistory = async (timeframe: types.ApyTimeframe) => {
+  const cacheKey = `getApyHistory-${timeframe}`;
+  const cached = apiCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    console.log("Cache hit for getApyHistory");
+    return cached.data;
+  }
+
   const now = Math.floor(Date.now() / 1000);
 
   // Calculate resolution and fromTimestamp based on timeframe
@@ -100,26 +166,47 @@ export const getApyHistory = async (timeframe: types.ApyTimeframe) => {
     data.length;
   const rateHistory = data.map((entry: any) => entry.liquidityRate_avg);
 
-  console.log("getApyHistory", {
-    avgRate,
-    rateHistory,
-  });
-
-  return {
+  const result = {
     avgRate,
     rateHistory,
   };
+
+  console.log("getApyHistory", result);
+
+  apiCache.set(cacheKey, {
+    data: result,
+    timestamp: Date.now(),
+  });
+
+  return result;
 };
 
 export const getCurrencyRate = async (currencySlug: types.CurrencySlug) => {
   if (currencySlug === "USD") {
     return 1;
   }
+
+  const cacheKey = `getCurrencyRate-${currencySlug}`;
+  const cached = apiCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    console.log("Cache hit for getCurrencyRate");
+    return cached.data;
+  }
+
   const apiUrl = `https://min-api.cryptocompare.com/data/price?fsym=USD&tsyms=${currencySlug}&api_key=059fad215d1927895c58d9ec92b3dd995165bfcc8fd797ab2d070d4e10c44c1f`;
   const response = await fetch(apiUrl);
   const json = await response.json();
   console.log("getCurrencyRate", json);
-  return json[currencySlug];
+
+  const result = json[currencySlug];
+
+  apiCache.set(cacheKey, {
+    data: result,
+    timestamp: Date.now(),
+  });
+
+  return result;
 };
 
 // POST
@@ -176,4 +263,13 @@ export const registerUserNotification = async (
   const json = await response.json();
   console.log("registerUserNotification", json);
   return json;
+};
+
+/**
+ * Resets all cached API responses
+ * Call this function when user logs out to clear all cached data
+ */
+export const resetCache = () => {
+  apiCache.clear();
+  console.log("API cache cleared");
 };

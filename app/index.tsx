@@ -2,10 +2,10 @@ import { usePrivy } from "@privy-io/expo";
 import Homepage from "@/pages/home/page";
 import LoginPage from "@/pages/login/page";
 import { useEffect } from "react";
-import useStore from "@/store/useStore";
+import useProtocol from "@/store/useProtocol";
 export default function Index() {
   const { user } = usePrivy();
-  const { fetchApyHistory } = useStore();
+  const { fetchApyHistory } = useProtocol();
 
   useEffect(() => {
     fetchApyHistory();

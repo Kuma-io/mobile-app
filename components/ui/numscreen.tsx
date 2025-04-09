@@ -1,11 +1,8 @@
 import { Text, View } from "react-native";
-import useStore from "@/store/useStore";
+import useSettings from "@/store/useSettings";
 import { CurrencySign } from "@/types/currency";
-
 export const NumScreen = ({ number }: { number: number }) => {
-  const {
-    settings: { currencySlug },
-  } = useStore();
+  const { currencySlug } = useSettings();
   const hasDecimals = number % 1 !== 0;
   const decimalPlaces = hasDecimals
     ? number.toString().split(".")[1].length

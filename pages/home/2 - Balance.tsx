@@ -1,15 +1,14 @@
 import { Text, View } from "react-native";
 import React from "react";
-import useStore from "@/store/useStore";
+import useUser from "@/store/useUser";
+import useSettings from "@/store/useSettings";
+import useProtocol from "@/store/useProtocol";
 import { formatYield } from "@/utils/formatYield";
 import { CurrencySign } from "@/types/currency";
 
 export default function Balance() {
-  const {
-    data: { balance, principal, yieldValue },
-    settings: { currencySlug, currencyRate },
-  } = useStore();
-  const annualYield = principal > 0 ? (yieldValue / principal) * 100 : 0;
+  const { balance, principal } = useUser();
+  const { currencySlug, currencyRate } = useSettings();
 
   return (
     <View className="w-full items-start justify-center px-8">

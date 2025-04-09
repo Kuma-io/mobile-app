@@ -4,7 +4,7 @@ import { Text, View } from "react-native";
 
 import { Button } from "@/components/ui/button";
 import Drawer from "@/components/ui/drawer";
-import useStore from "@/store/useStore";
+import useSettings from "@/store/useSettings";
 import { triggerHaptic } from "@/utils/haptics";
 
 export default function CurrencyModal({
@@ -44,10 +44,7 @@ const CURRENCIES = [
 ] as const;
 
 const SelectCurrency = ({ onClose }: { onClose: () => void }) => {
-  const {
-    updateCurrencySlug,
-    settings: { currencySlug },
-  } = useStore();
+  const { currencySlug, updateCurrencySlug } = useSettings();
 
   return (
     <View className="w-full flex-col gap-2 my-8">

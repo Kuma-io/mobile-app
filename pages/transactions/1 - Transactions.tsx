@@ -6,7 +6,8 @@ import {
   ArrowUpToLine,
   CircleDollarSign,
 } from "lucide-react-native";
-import useStore from "@/store/useStore";
+import useUser from "@/store/useUser";
+import useSettings from "@/store/useSettings";
 import { CurrencySign } from "@/types/currency";
 import { getRelativeTimeGroup } from "@/utils/getRelativeTimeGroup";
 
@@ -23,8 +24,8 @@ interface GroupedActions {
 export default function Transactions() {
   const {
     data: { actions },
-    settings: { currencySlug, currencyRate },
-  } = useStore();
+  } = useUser();
+  const { currencySlug, currencyRate } = useSettings();
 
   const groupedActions: GroupedActions = actions.reduce((groups, action) => {
     const date = new Date(action.timestamp);

@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useState, useRef } from "react";
 import { Text, TouchableOpacity, View, ActivityIndicator } from "react-native";
 import { LineChart } from "react-native-wagmi-charts";
-import useStore from "@/store/useStore";
 import { triggerHaptic } from "@/utils/haptics";
 import React from "react";
 import { ApyTimeframe } from "@/types";
-
+import useProtocol from "@/store/useProtocol";
 interface TimeFrameSelectorProps {
   timeFrame: string;
   onTimeFrameChange: (timeFrame: string) => void;
@@ -20,11 +19,8 @@ const timeframeMap: { [key: string]: ApyTimeframe } = {
 };
 
 export default function Chart() {
-  const {
-    stats: { apyHistory, timeframe, avgApy },
-    fetchApyHistory,
-    updateApyTimeframe,
-  } = useStore();
+  const { apyHistory, timeframe, apyAvg, fetchApyHistory, updateTimeframe } =
+    useProtocol();
 
   const [isLoading, setIsLoading] = useState(false);
   const [chartData, setChartData] = useState<
@@ -94,7 +90,7 @@ export default function Chart() {
 
   const handleTimeFrameChange = async (newTimeFrame: string) => {
     const apiTimeframe = timeframeMap[newTimeFrame];
-    updateApyTimeframe(apiTimeframe as ApyTimeframe);
+    updateTimeframe(apiTimeframe as ApyTimeframe);
     setIsLoading(true);
     try {
       await fetchApyHistory();
@@ -147,13 +143,13 @@ export default function Chart() {
           <LineChart.Path color="black">
             <LineChart.Dot color="black" at={chartData.length - 1} hasPulse />
             <LineChart.HorizontalLine
-              at={{ index: getClosestValueIndex(chartData, avgApy) }}
+              at={{ index: getClosestValueIndex(chartData, apyAvg) }}
               color="gray"
             />
           </LineChart.Path>
           <View className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white px-1 rounded">
             <Text className="text-xs text-gray-500">
-              Avg {(avgApy * 100).toFixed(2)}%
+              Avg {(apyAvg * 100).toFixed(2)}%
             </Text>
           </View>
           <LineChart.CursorCrosshair

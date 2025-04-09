@@ -11,7 +11,6 @@ import { NumScreen } from "@/components/ui/numscreen";
 import { deposit } from "@/lib/deposit";
 import { useSmartWallets } from "@privy-io/expo/smart-wallets";
 import { triggerHaptic } from "@/utils/haptics";
-import useStore from "@/store/useStore";
 import MoonpayLoading from "./moonpay-loading";
 import { useMoonPaySdk } from "@moonpay/react-native-moonpay-sdk";
 import * as WebBrowser from "expo-web-browser";
@@ -26,7 +25,6 @@ export default function DepositDrawer({
   const [number, setNumber] = useState<number>(0);
   const [depositInitiated, setDepositInitiated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { settings, data } = useStore();
   useEffect(() => {
     if (!isVisible) {
       setDepositInitiated(false);

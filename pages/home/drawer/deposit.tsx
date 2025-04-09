@@ -11,8 +11,8 @@ import { NumScreen } from "@/components/ui/numscreen";
 import { deposit } from "@/lib/deposit";
 import { useSmartWallets } from "@privy-io/expo/smart-wallets";
 import { triggerHaptic } from "@/utils/haptics";
-import useStore from "@/store/useStore";
-
+import useUser from "@/store/useUser";
+import useSettings from "@/store/useSettings";
 export default function DepositDrawer({
   isVisible,
   onClose,
@@ -23,11 +23,8 @@ export default function DepositDrawer({
   const [number, setNumber] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const { client } = useSmartWallets();
-  const {
-    fetchPositionData,
-    fetchActions,
-    settings: { currencyRate },
-  } = useStore();
+  const { fetchPositionData, fetchActions } = useUser();
+  const { currencyRate } = useSettings();
 
   useEffect(() => {
     if (!isVisible) {

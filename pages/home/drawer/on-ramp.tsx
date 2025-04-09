@@ -4,11 +4,11 @@ import Drawer from "@/components/ui/drawer";
 import { useMoonPaySdk } from "@moonpay/react-native-moonpay-sdk";
 import * as WebBrowser from "expo-web-browser";
 import { Button } from "@/components/ui/button";
-import useStore from "@/store/useStore";
 import { ChevronRight } from "lucide-react-native";
 import { NumPad } from "@/components/ui/numpad";
 import { NumScreen } from "@/components/ui/numscreen";
-import { useSmartWallets } from "@privy-io/expo/smart-wallets";
+import useUser from "@/store/useUser";
+import useSettings from "@/store/useSettings";
 
 const MOONPAY_API_KEY = "pk_test_lhO0wUX5sQ5aKsEIIj7P3j7z15jwPPzL";
 
@@ -21,12 +21,6 @@ export default function OnRampDrawer({
 }) {
   const [number, setNumber] = useState<number>(10);
   const [isLoading, setIsLoading] = useState(false);
-  const { client } = useSmartWallets();
-  const {
-    fetchPositionData,
-    fetchActions,
-    settings: { currencyRate },
-  } = useStore();
 
   useEffect(() => {
     if (!isVisible) {
@@ -34,7 +28,8 @@ export default function OnRampDrawer({
     }
   }, [isVisible]);
 
-  const { data, settings } = useStore();
+  const { email, walletAddress } = useUser();
+  const { currencySlug } = useSettings();
   const { openWithInAppBrowser, generateUrlForSigning, updateSignature } =
     useMoonPaySdk({
       sdkConfig: {
@@ -45,9 +40,9 @@ export default function OnRampDrawer({
           currencyCode: "eth",
           lockAmount: "true",
           baseCurrencyAmount: number.toString(),
-          baseCurrencyCode: settings.currencySlug,
-          email: data.email,
-          walletAddress: data.walletAddress!,
+          baseCurrencyCode: currencySlug,
+          email: email!,
+          walletAddress: walletAddress!,
         },
         handlers: {
           onAuthToken: async (token) => {

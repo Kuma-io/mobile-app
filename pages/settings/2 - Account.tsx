@@ -1,12 +1,10 @@
 import { View, Text } from "react-native";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, UserRound, Wallet } from "lucide-react-native";
-import useStore from "@/store/useStore";
+import useUser from "@/store/useUser";
 
 export default function Account() {
-  const {
-    data: { walletAddress, email },
-  } = useStore();
+  const { email, walletAddress } = useUser();
   return (
     <View className="w-full items-start justify-center px-8">
       <Text className="mb-2 font-sans-extrabold text-xl">Account</Text>

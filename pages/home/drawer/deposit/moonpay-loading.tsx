@@ -1,37 +1,13 @@
 import { View, Text, Pressable } from "react-native";
 import { useMoonPaySdk } from "@moonpay/react-native-moonpay-sdk";
 import * as WebBrowser from "expo-web-browser";
-import useStore from "@/store/useStore";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react-native";
+import { ChevronLeft } from "lucide-react-native";
+import useUser from "@/store/useUser";
+import useSettings from "@/store/useSettings";
 
 const MOONPAY_API_KEY = "pk_test_lhO0wUX5sQ5aKsEIIj7P3j7z15jwPPzL";
-
-type OnInitiateDepositProps = {
-  transactionId: string;
-  cryptoCurrency: {
-    id: string;
-    name: string;
-    code: string;
-    contractAddress: string | null;
-    chainId: string | null;
-    coinType: string | null;
-    networkCode: string | null;
-  };
-  fiatCurrency: {
-    id: string;
-    name: string;
-    code: string;
-  };
-  /** Crypto amount in its base unit (0.123 ETH === "0.123") */
-  cryptoCurrencyAmount: string;
-  /** Crypto amount in its smallest unit (1 ETH === 1x10^18) */
-  cryptoCurrencyAmountSmallestDenomination: string;
-  /** Fiat amount in its base unit ($1.23 === "1.23"). Only set for fixed quotes. */
-  fiatCurrencyAmount: string | null;
-  depositWalletAddress: string;
-};
 
 export default function MoonpayLoading({
   amount,
@@ -40,7 +16,8 @@ export default function MoonpayLoading({
   amount: number;
   onOpen: () => void;
 }) {
-  const { settings, data } = useStore();
+  const { currencySlug } = useSettings();
+  const { email, walletAddress } = useUser();
   const { openWithInAppBrowser, generateUrlForSigning, updateSignature } =
     useMoonPaySdk({
       sdkConfig: {
@@ -51,45 +28,59 @@ export default function MoonpayLoading({
           currencyCode: "eth",
           lockAmount: "true",
           baseCurrencyAmount: amount.toString(),
-          baseCurrencyCode: settings.currencySlug,
-          email: data.email,
-          walletAddress: data.walletAddress!,
+          baseCurrencyCode: currencySlug,
+          email: email!,
+          walletAddress: walletAddress!,
         },
         handlers: {
-          async onInitiateDeposit(properties: OnInitiateDepositProps) {
-            // Your own crypto deposit code
-            const {
-              cryptoCurrency,
-              cryptoCurrencyAmount,
-              depositWalletAddress,
-            } = properties;
-            const depositId = await deposit(
-              cryptoCurrency.code,
-              cryptoCurrencyAmount,
-              depositWalletAddress
-            );
-            return { depositId };
+          async onTransactionCreated(props) {
+            console.log("Moonpay transaction created", props);
           },
-          // onClose: async () => {
-          //   console.log("Moonpay closed");
-          //   // Handle widget closure
-          //   // You can add navigation or state updates here
-          // },
-          // onLogin: async ({ isRefresh }) => {
-          //   console.log("Moonpay login", { isRefresh });
-          //   // Handle login/refresh
-          //   // isRefresh indicates if this is a token refresh rather than new login
-          // },
-          // onTransactionCreated: async (props) => {
-          //   console.log("Moonpay transaction created", props);
-          //   // Handle transaction creation
-          //   // props contains transaction details like id, status, amounts
-          // },
-          // onTransactionCompleted: async (props) => {
-          //   console.log("Moonpay transaction completed", props);
-          //   // Handle transaction completion
-          //   // props contains full transaction details including fees, amounts, status
-          // },
+          async onTransactionCompleted(props) {
+            console.log("Moonpay transaction completed", props);
+            console.log("Transaction status:", props.status);
+            console.log("Transaction ID:", props.id);
+            console.log(
+              "Amount:",
+              props.baseCurrencyAmount,
+              props.baseCurrency.code
+            );
+            console.log(
+              "Received:",
+              props.quoteCurrencyAmount,
+              props.quoteCurrency.code
+            );
+          },
+          async onClose() {
+            console.log("Moonpay widget closed");
+          },
+          async onUnsupportedRegion() {
+            console.log("Moonpay unsupported region detected");
+          },
+          async onLogin(props) {
+            console.log("Moonpay user logged in", props);
+          },
+          async onInitiateDeposit(props) {
+            console.log("Moonpay initiate deposit", props);
+            console.log("Transaction ID:", props.transactionId);
+            console.log(
+              "Crypto:",
+              props.cryptoCurrencyAmount,
+              props.cryptoCurrency.code
+            );
+            console.log(
+              "Fiat:",
+              props.fiatCurrencyAmount,
+              props.fiatCurrency.code
+            );
+            console.log("Wallet:", props.depositWalletAddress);
+
+            // Return a deposit ID for the transaction
+            return {
+              depositId: `deposit-${props.transactionId}`,
+              cancelTransactionOnError: false,
+            };
+          },
         },
       },
       browserOpener: {
@@ -100,26 +91,22 @@ export default function MoonpayLoading({
     });
 
   useEffect(() => {
+    const url = generateUrlForSigning({ variant: "inapp-browser" });
     const apiUrl = `https://kuma-server.vercel.app/sign-moonpay`;
+
     fetch(apiUrl, {
       headers: {
         "Content-Type": "application/json",
         "x-api-key": "1234567890",
       },
       method: "POST",
-      body: JSON.stringify({
-        url: generateUrlForSigning({ variant: "inapp-browser" }),
-      }),
+      body: JSON.stringify({ url }),
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(
-          "data",
-          generateUrlForSigning({ variant: "inapp-browser" })
-        );
-        const signature = data.signature;
-        console.log("signature", signature);
-        updateSignature(signature);
+        console.log("url", url);
+        console.log("signature", data.signature);
+        updateSignature(data.signature);
       });
   }, []);
 

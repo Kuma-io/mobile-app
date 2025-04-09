@@ -1,6 +1,8 @@
 import React from "react";
 import { View, Text, Pressable } from "react-native";
-import useStore from "@/store/useStore";
+import useUser from "@/store/useUser";
+import useSettings from "@/store/useSettings";
+import useProtocol from "@/store/useProtocol";
 import {
   ArrowDownToLine,
   ArrowUpToLine,
@@ -14,8 +16,8 @@ import { getRelativeTimeGroup } from "@/utils/getRelativeTimeGroup";
 export default function Activity() {
   const {
     data: { actions },
-    settings: { currencySlug, currencyRate },
-  } = useStore();
+  } = useUser();
+  const { currencySlug, currencyRate } = useSettings();
 
   const sortedActions = [...actions].sort(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()

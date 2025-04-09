@@ -1,11 +1,10 @@
 import { View, Text } from "react-native";
-import useStore from "@/store/useStore";
+import useUser from "@/store/useUser";
 import { CurrencySign } from "@/types/currency";
+import useSettings from "@/store/useSettings";
 export default function Principal() {
-  const {
-    data: { principal },
-    settings: { currencySlug, currencyRate },
-  } = useStore();
+  const { principal } = useUser();
+  const { currencySlug, currencyRate } = useSettings();
   return (
     <View className="w-full flex-row items-center justify-between px-6 pb-4">
       <View className="flex-col items-start">

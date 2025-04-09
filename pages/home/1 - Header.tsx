@@ -4,21 +4,18 @@ import React, { useEffect } from "react";
 import { Text, View } from "react-native";
 
 import { Button } from "@/components/ui/button";
-import useStore from "@/store/useStore";
+import useUser from "@/store/useUser";
+import useSettings from "@/store/useSettings";
+import useProtocol from "@/store/useProtocol";
 import { useEmbeddedWallet, usePrivy } from "@privy-io/expo";
 import { registerUser } from "@/lib/api";
 
 export default function Header() {
   const { user } = usePrivy();
-  const {
-    updateWalletAddress,
-    fetchPositionData,
-    fetchActions,
-    fetchApy,
-    fetchNotification,
-    fetchCurrencyRate,
-    updateEmail,
-  } = useStore();
+  const { updateEmail, updateWalletAddress, fetchPositionData, fetchActions } =
+    useUser();
+  const { fetchNotification, fetchCurrencyRate } = useSettings();
+  const { fetchApy } = useProtocol();
   const wallet = useEmbeddedWallet();
 
   useEffect(() => {

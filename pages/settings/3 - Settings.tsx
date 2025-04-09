@@ -1,9 +1,9 @@
 import { View, Text } from "react-native";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, BellDot, BadgeEuro } from "lucide-react-native";
-import useStore from "@/store/useStore";
 import ToggleSwitch from "toggle-switch-react-native";
 import { toast } from "sonner-native";
+import useSettings from "@/store/useSettings";
 export default function Settings({
   currencyModal,
   setCurrencyModal,
@@ -11,10 +11,7 @@ export default function Settings({
   currencyModal: boolean;
   setCurrencyModal: (value: boolean) => void;
 }) {
-  const {
-    settings: { currencySlug, notification },
-    updateNotification,
-  } = useStore();
+  const { currencySlug, notification, updateNotification } = useSettings();
   return (
     <View className="w-full items-start justify-center px-8">
       <Text className="mb-2 font-sans-extrabold text-xl">Settings</Text>

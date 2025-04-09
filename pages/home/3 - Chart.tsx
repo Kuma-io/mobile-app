@@ -1,7 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { LineChart } from "react-native-wagmi-charts";
-import useStore from "@/store/useStore";
+import useUser from "@/store/useUser";
+import useSettings from "@/store/useSettings";
+import useProtocol from "@/store/useProtocol";
 import { triggerHaptic } from "@/utils/haptics";
 import { UserPositionTimeframe } from "@/types";
 interface TimeFrameSelectorProps {
@@ -19,11 +21,11 @@ const timeframeMap: { [key: string]: UserPositionTimeframe } = {
 
 export default function Chart() {
   const {
-    data: { positionData, timeframe },
+    data: { positions },
     fetchPositionData,
-    updateTimeframe,
     updateBalance,
-  } = useStore();
+  } = useUser();
+  const { timeframe, updateTimeframe } = useSettings();
 
   const [chartData, setChartData] = useState<
     {
@@ -35,13 +37,15 @@ export default function Chart() {
   const chartDataRef = useRef(chartData);
 
   useEffect(() => {
-    const chartData = positionData.map((item) => ({
-      timestamp: item.timestamp,
-      value: item.value,
-    }));
-    setChartData(chartData);
-    chartDataRef.current = chartData;
-  }, [positionData]);
+    if (positions && positions.length > 0) {
+      const chartData = positions.map((item) => ({
+        timestamp: item.timestamp,
+        value: item.value,
+      }));
+      setChartData(chartData);
+      chartDataRef.current = chartData;
+    }
+  }, [positions]);
 
   // Get the UI timeframe from API timeframe
   const getUITimeframe = (apiTimeframe: UserPositionTimeframe) => {

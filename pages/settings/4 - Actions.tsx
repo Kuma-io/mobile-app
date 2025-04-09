@@ -3,8 +3,10 @@ import { router } from "expo-router";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import { Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import useStore from "@/store/useStore";
-
+import useUser from "@/store/useUser";
+import useSettings from "@/store/useSettings";
+import useProtocol from "@/store/useProtocol";
+import { resetCache } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { triggerHaptic } from "@/utils/haptics";
 import { toast } from "sonner-native";
@@ -12,7 +14,9 @@ import { toast } from "sonner-native";
 export default function Actions() {
   const insets = useSafeAreaInsets();
   const { logout } = usePrivy();
-  const reset = useStore((state) => state.reset);
+  const { reset: resetUser } = useUser();
+  const { reset: resetSettings } = useSettings();
+  const { reset: resetProtocol } = useProtocol();
   return (
     <View
       style={{
@@ -38,7 +42,10 @@ export default function Actions() {
         onPress={async () => {
           try {
             await logout();
-            reset();
+            resetUser();
+            resetSettings();
+            resetProtocol();
+            resetCache();
             router.replace("/");
             triggerHaptic("error");
             toast.success("Logged out");

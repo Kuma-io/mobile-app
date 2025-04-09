@@ -1,5 +1,7 @@
 import React from "react";
-import useStore from "@/store/useStore";
+import useUser from "@/store/useUser";
+import useSettings from "@/store/useSettings";
+import useProtocol from "@/store/useProtocol";
 import { Pressable, Text, View } from "react-native";
 import { formatYield } from "@/utils/formatYield";
 import { router } from "expo-router";
@@ -29,9 +31,7 @@ export default function Stats() {
 }
 
 const AaveYield = () => {
-  const { stats } = useStore();
-  const annualYield = stats.apy;
-  const aaveApyVariation = stats.apyVariation;
+  const { apy, apyVariation } = useProtocol();
   return (
     <View className="h-24 flex-1 items-center rounded-2xl bg-black">
       <View className="items-start flex-1 justify-around p-4 pt-3 pl-8">
@@ -39,15 +39,15 @@ const AaveYield = () => {
           Live Yield
         </Text>
         <Text className="font-sans-bold text-3xl text-white">
-          {(annualYield * 100).toFixed(3)}%
+          {apy.toFixed(3)}%
         </Text>
         <Text
           className={`mt-1 font-sans-bold text-sm ${
-            aaveApyVariation < 0 ? "text-red-500" : "text-green-500"
+            apyVariation < 0 ? "text-red-500" : "text-green-500"
           }`}
         >
-          {aaveApyVariation < 0 ? "▼" : "▲"}
-          {aaveApyVariation.toFixed(3)}%
+          {apyVariation < 0 ? "▼" : "▲"}
+          {apyVariation.toFixed(3)}%
         </Text>
       </View>
     </View>
@@ -55,10 +55,8 @@ const AaveYield = () => {
 };
 
 const Rewards = () => {
-  const {
-    data: { principal, yieldValue },
-    settings: { currencySlug, currencyRate },
-  } = useStore();
+  const { principal, yield: yieldValue } = useUser();
+  const { currencySlug, currencyRate } = useSettings();
   const annualYield = principal > 0 ? (yieldValue / principal) * 100 : 0;
   return (
     <View className="h-24 flex-1 items-center justify-center rounded-2xl bg-black">
