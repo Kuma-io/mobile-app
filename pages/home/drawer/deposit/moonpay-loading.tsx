@@ -1,11 +1,11 @@
-import { View, Text, Pressable } from "react-native";
+import { Button } from "@/components/ui/button";
+import useSettings from "@/store/useSettings";
+import useUser from "@/store/useUser";
 import { useMoonPaySdk } from "@moonpay/react-native-moonpay-sdk";
 import * as WebBrowser from "expo-web-browser";
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { ChevronLeft } from "lucide-react-native";
-import useUser from "@/store/useUser";
-import useSettings from "@/store/useSettings";
+import { useEffect } from "react";
+import { Pressable, Text, View } from "react-native";
 
 const MOONPAY_API_KEY = "pk_test_lhO0wUX5sQ5aKsEIIj7P3j7z15jwPPzL";
 
@@ -54,32 +54,8 @@ export default function MoonpayLoading({
           async onClose() {
             console.log("Moonpay widget closed");
           },
-          async onUnsupportedRegion() {
-            console.log("Moonpay unsupported region detected");
-          },
           async onLogin(props) {
             console.log("Moonpay user logged in", props);
-          },
-          async onInitiateDeposit(props) {
-            console.log("Moonpay initiate deposit", props);
-            console.log("Transaction ID:", props.transactionId);
-            console.log(
-              "Crypto:",
-              props.cryptoCurrencyAmount,
-              props.cryptoCurrency.code
-            );
-            console.log(
-              "Fiat:",
-              props.fiatCurrencyAmount,
-              props.fiatCurrency.code
-            );
-            console.log("Wallet:", props.depositWalletAddress);
-
-            // Return a deposit ID for the transaction
-            return {
-              depositId: `deposit-${props.transactionId}`,
-              cancelTransactionOnError: false,
-            };
           },
         },
       },
@@ -104,8 +80,6 @@ export default function MoonpayLoading({
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("url", url);
-        console.log("signature", data.signature);
         updateSignature(data.signature);
       });
   }, []);
