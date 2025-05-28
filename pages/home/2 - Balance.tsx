@@ -2,8 +2,6 @@ import { Text, View } from "react-native";
 import React from "react";
 import useUser from "@/store/useUser";
 import useSettings from "@/store/useSettings";
-import useProtocol from "@/store/useProtocol";
-import { formatYield } from "@/utils/formatYield";
 import { CurrencySign } from "@/types/currency";
 
 export default function Balance() {

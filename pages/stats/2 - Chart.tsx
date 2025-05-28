@@ -4,7 +4,7 @@ import { LineChart } from "react-native-wagmi-charts";
 import { triggerHaptic } from "@/utils/haptics";
 import React from "react";
 import { ApyTimeframe } from "@/types";
-import useProtocol from "@/store/useProtocol";
+import useAave from "@/store/useAave";
 interface TimeFrameSelectorProps {
   timeFrame: string;
   onTimeFrameChange: (timeFrame: string) => void;
@@ -19,8 +19,13 @@ const timeframeMap: { [key: string]: ApyTimeframe } = {
 };
 
 export default function Chart() {
-  const { apyHistory, timeframe, apyAvg, fetchApyHistory, updateTimeframe } =
-    useProtocol();
+  const {
+    apyTimeframeHistory,
+    timeframe,
+    apyTimeframe,
+    getApyHistory,
+    setTimeframe,
+  } = useAave();
 
   const [isLoading, setIsLoading] = useState(false);
   const [chartData, setChartData] = useState<
@@ -66,16 +71,16 @@ export default function Chart() {
     }[timeframe];
 
     const timestampStep =
-      (timeframeInDays * 24 * 60 * 60 * 1000) / apyHistory.length;
+      (timeframeInDays * 24 * 60 * 60 * 1000) / apyTimeframeHistory.length;
 
-    const chartData = apyHistory.map((value, index) => ({
-      timestamp: now - (apyHistory.length - 1 - index) * timestampStep,
+    const chartData = apyTimeframeHistory.map((value, index) => ({
+      timestamp: now - (apyTimeframeHistory.length - 1 - index) * timestampStep,
       value: value * 100,
     }));
 
     setChartData(chartData);
     chartDataRef.current = chartData;
-  }, [apyHistory]);
+  }, [apyTimeframeHistory]);
 
   // Get the UI timeframe from API timeframe
   const getUITimeframe = (apiTimeframe: string) => {
@@ -90,10 +95,10 @@ export default function Chart() {
 
   const handleTimeFrameChange = async (newTimeFrame: string) => {
     const apiTimeframe = timeframeMap[newTimeFrame];
-    updateTimeframe(apiTimeframe as ApyTimeframe);
+    setTimeframe(apiTimeframe as ApyTimeframe);
     setIsLoading(true);
     try {
-      await fetchApyHistory();
+      await getApyHistory();
     } finally {
       setIsLoading(false);
     }
@@ -143,13 +148,13 @@ export default function Chart() {
           <LineChart.Path color="black">
             <LineChart.Dot color="black" at={chartData.length - 1} hasPulse />
             <LineChart.HorizontalLine
-              at={{ index: getClosestValueIndex(chartData, apyAvg) }}
+              at={{ index: getClosestValueIndex(chartData, apyTimeframe) }}
               color="gray"
             />
           </LineChart.Path>
           <View className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white px-1 rounded">
             <Text className="text-xs text-gray-500">
-              Avg {(apyAvg * 100).toFixed(2)}%
+              Avg {(apyTimeframe * 100).toFixed(2)}%
             </Text>
           </View>
           <LineChart.CursorCrosshair

@@ -2,7 +2,6 @@ import React from "react";
 import { View, Text, Pressable } from "react-native";
 import useUser from "@/store/useUser";
 import useSettings from "@/store/useSettings";
-import useProtocol from "@/store/useProtocol";
 import {
   ArrowDownToLine,
   ArrowUpToLine,
@@ -14,9 +13,7 @@ import { triggerHaptic } from "@/utils/haptics";
 import { getRelativeTimeGroup } from "@/utils/getRelativeTimeGroup";
 
 export default function Activity() {
-  const {
-    data: { actions },
-  } = useUser();
+  const { actions, getActions } = useUser();
   const { currencySlug, currencyRate } = useSettings();
 
   const sortedActions = [...actions].sort(

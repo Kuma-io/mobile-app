@@ -76,5 +76,10 @@
     "tailwindcss": "^3.3.2",
     "typescript": "~5.3.3"
   },
+  "overrides": {
+    "lucide-react-native": {
+      "react": "^19"
+    }
+  },
   "private": true
 }

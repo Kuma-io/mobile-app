@@ -1,11 +1,11 @@
 import { Text, View } from "react-native";
 import React from "react";
-import useProtocol from "@/store/useProtocol";
+import useAave from "@/store/useAave";
 import { CurrencySign } from "@/types/currency";
 import useSettings from "@/store/useSettings";
 
 export default function Overview() {
-  const { totalSupply, apy } = useProtocol();
+  const { aus, apy } = useAave();
   const { currencySlug, currencyRate } = useSettings();
 
   return (
@@ -15,7 +15,7 @@ export default function Overview() {
           Protocol Supplied
         </Text>
         <Text className="font-sans-extrabold text-4xl tracking-[0.05em] pl-2">
-          {`${((totalSupply * currencyRate) / 1000000).toFixed(2)}M ${
+          {`${((aus * currencyRate) / 1000000).toFixed(2)}M ${
             CurrencySign.find((currency) => currency.slug === currencySlug)
               ?.sign
           }`}

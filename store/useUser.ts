@@ -4,169 +4,150 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   getUserActions,
   getUserPositions,
-  getApy,
-  getApyHistory,
-  registerUserNotification,
-  getUserNotifications,
-  getCurrencyRate,
-} from "@/lib/api";
+  setUser,
+  setUserNotification,
+} from "@/lib/api/user";
 import * as types from "@/types";
-import { toast } from "sonner-native";
-import { triggerHaptic } from "@/utils/haptics";
 import useSettings from "./useSettings";
+
 interface UserState {
-  email: string | null;
-  walletAddress: string | null;
+  user: types.User | null;
+
+  positions: types.ChartPosition[];
+  actions: types.UserAction[];
+
   balance: number;
   principal: number;
   yield: number;
-  data: {
-    positions: types.ChartData[];
-    actions: types.Action[];
-  };
 
-  // Methods
-  updateEmail: (email: string) => void;
-  updateWalletAddress: (walletAddress: string) => void;
-  updateBalance: (balance: number) => void;
-  fetchPositionData: () => Promise<void>;
-  fetchActions: () => Promise<void>;
+  // -- METHODS --
+  setUser: (wallet: string, email: string) => Promise<void>;
+  setNotification: (notification: boolean) => Promise<void>;
+  getPositions: () => Promise<void>;
+  getActions: () => Promise<void>;
   reset: () => void;
 }
 
 const useUser = create<UserState>()(
   persist(
     (set, get) => ({
-      email: null,
-      walletAddress: null,
+      user: null,
+      positions: [],
+      actions: [],
       balance: 0,
       principal: 0,
       yield: 0,
-      // Data
-      data: {
-        positions: [],
-        actions: [],
+
+      // -- METHODS --
+      // - USERS
+      setUser: async (wallet: string, email: string) => {
+        try {
+          const user = await setUser(wallet, email);
+
+          set((state) => ({
+            ...state,
+            user,
+          }));
+
+          console.log("USER OBJECT", user.wallet, user.email);
+
+          const { getPositions, getActions } = get();
+          await Promise.all([getPositions(), getActions()]);
+        } catch (error) {
+          console.error("setUser error:", error);
+        }
       },
 
-      // Methods
-      updateEmail: (email: string) =>
-        set((state) => ({
-          ...state,
-          email,
-        })),
-      updateWalletAddress: (walletAddress: string) =>
-        set((state) => ({
-          ...state,
-          walletAddress,
-        })),
-      updateBalance: (balance: number) =>
-        set((state) => ({
-          ...state,
-          balance,
-        })),
-      fetchPositionData: async () => {
-        const { walletAddress } = get();
-        const { timeframe } = useSettings.getState();
-
-        if (!walletAddress) {
-          console.error("No wallet address available");
-          return;
-        }
-
+      // - NOTIFICATIONS
+      setNotification: async (notification: boolean) => {
         try {
-          const json = await getUserPositions(walletAddress, timeframe);
-          if (!json.userPositions || json.userPositions.length === 0) {
-            console.log("No position data available");
-            return;
-          }
+          const { user } = get();
+          if (!user) throw new Error("No user available");
+          await setUserNotification(user, notification);
+        } catch (error) {
+          console.error("setNotification error:", error);
+        }
+      },
+
+      // - POSITIONS
+      getPositions: async () => {
+        try {
+          const { user } = get();
+          const { timeframe } = useSettings.getState();
+
+          if (!user) throw new Error("No user available");
+
+          const userPositions = await getUserPositions(user, timeframe);
+          if (!userPositions || userPositions.length === 0)
+            throw new Error("No position data available");
 
           // Transform API data into ChartData format
-          const positionData: types.ChartData[] = json.userPositions
+          const positions: types.ChartPosition[] = userPositions
             .map((position: types.UserPosition) => ({
               timestamp: new Date(position.timestamp).getTime(),
               value: parseFloat(position.userBalance),
             }))
             .sort(
-              (a: types.ChartData, b: types.ChartData) =>
+              (a: types.ChartPosition, b: types.ChartPosition) =>
                 a.timestamp - b.timestamp
             );
-          // Get the latest position data
-          const latestData = json.userPositions[0];
+
+          const latestData = userPositions[0];
           const principal = parseFloat(latestData.userPrincipal);
           const balance = parseFloat(latestData.userBalance);
 
           set((state) => ({
             ...state,
+            positions,
             balance,
             principal,
             yield: balance - principal,
-            data: {
-              positions: positionData,
-              actions: state.data.actions,
-            },
           }));
         } catch (error) {
-          console.error("Fetch error:", error);
+          console.error("getPositions error:", error);
         }
       },
-      fetchActions: async () => {
-        const { walletAddress } = get();
 
-        if (!walletAddress) {
-          console.error("No wallet address available");
-          return;
-        }
-
+      // - ACTIONS
+      getActions: async () => {
         try {
-          const json = await getUserActions(walletAddress);
-          if (!json.userActions || json.userActions.length === 0) {
+          const { user } = get();
+          if (!user) throw new Error("No user available");
+
+          const actions = await getUserActions(user);
+          if (!actions || actions.length === 0) {
             console.log("No actions available");
             return;
           }
 
-          const actions: types.Action[] = json.userActions.map(
-            (action: any) => ({
-              timestamp: action.timestamp,
-              action: action.action,
-              amount: action.amount,
-            })
-          );
-
           set((state) => ({
             ...state,
-            data: {
-              positions: state.data.positions,
-              actions,
-            },
+            actions,
           }));
         } catch (error) {
-          console.error("Error fetching actions:", error);
+          console.error("getActions error:", error);
         }
       },
       reset: () =>
         set((state) => ({
           ...state,
-          email: null,
-          walletAddress: null,
           balance: 0,
           principal: 0,
           yield: 0,
-          data: {
-            positions: [],
-            actions: [],
-          },
+          positions: [],
+          actions: [],
         })),
     }),
     {
       name: "app-storage",
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
-        email: state.email,
-        walletAddress: state.walletAddress,
+        user: state.user,
+        positions: state.positions,
+        actions: state.actions,
         balance: state.balance,
         principal: state.principal,
         yield: state.yield,
-        data: state.data,
       }),
       onRehydrateStorage: () => (state) => {
         console.log("Rehydrated state:", state);

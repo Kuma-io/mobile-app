@@ -6,16 +6,14 @@ import { Text, View } from "react-native";
 import { Button } from "@/components/ui/button";
 import useUser from "@/store/useUser";
 import useSettings from "@/store/useSettings";
-import useProtocol from "@/store/useProtocol";
+import useAave from "@/store/useAave";
 import { useEmbeddedWallet, usePrivy } from "@privy-io/expo";
-import { registerUser } from "@/lib/api";
 
 export default function Header() {
   const { user } = usePrivy();
-  const { updateEmail, updateWalletAddress, fetchPositionData, fetchActions } =
-    useUser();
-  const { fetchNotification, fetchCurrencyRate } = useSettings();
-  const { fetchApy } = useProtocol();
+  const { setUser } = useUser();
+  const { getCurrency, currencySlug } = useSettings();
+  const { getApy } = useAave();
   const wallet = useEmbeddedWallet();
 
   useEffect(() => {
@@ -23,7 +21,7 @@ export default function Header() {
       const smartWallet = user?.linked_accounts.find(
         (account) => account.type === "smart_wallet"
       );
-      const walletAddress = smartWallet?.address;
+      const wallet = smartWallet?.address;
       const emailAccount = user?.linked_accounts.find(
         (account) =>
           account.type === "google_oauth" ||
@@ -34,26 +32,15 @@ export default function Header() {
         emailAccount?.type === "email"
           ? emailAccount.address
           : emailAccount?.email;
-      console.log(walletAddress, emailAccount);
-      if (walletAddress && email) {
-        updateWalletAddress(walletAddress);
-        updateEmail(email);
-        await registerUser(walletAddress, email);
-        await Promise.all([
-          fetchPositionData(),
-          fetchActions(),
-          fetchApy(),
-          fetchCurrencyRate(),
-        ]);
-        fetchNotification();
+      console.log("Header", wallet, email);
+      if (wallet && email) {
+        await setUser(wallet, email);
+        await Promise.all([getApy(), getCurrency(currencySlug, false)]);
       }
     };
 
-    if (wallet.status === "not-created") {
-      wallet.create();
-    } else if (wallet.status === "connected") {
-      initializeWallet();
-    }
+    if (wallet.status === "not-created") wallet.create();
+    else if (wallet.status === "connected") initializeWallet();
   }, [wallet.status]);
 
   return (

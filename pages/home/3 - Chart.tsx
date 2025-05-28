@@ -3,7 +3,6 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { LineChart } from "react-native-wagmi-charts";
 import useUser from "@/store/useUser";
 import useSettings from "@/store/useSettings";
-import useProtocol from "@/store/useProtocol";
 import { triggerHaptic } from "@/utils/haptics";
 import { UserPositionTimeframe } from "@/types";
 interface TimeFrameSelectorProps {
@@ -20,12 +19,8 @@ const timeframeMap: { [key: string]: UserPositionTimeframe } = {
 };
 
 export default function Chart() {
-  const {
-    data: { positions },
-    fetchPositionData,
-    updateBalance,
-  } = useUser();
-  const { timeframe, updateTimeframe } = useSettings();
+  const { positions, getPositions } = useUser();
+  const { timeframe, setTimeframe } = useSettings();
 
   const [chartData, setChartData] = useState<
     {
@@ -60,8 +55,8 @@ export default function Chart() {
 
   const handleTimeFrameChange = (newTimeFrame: string) => {
     const apiTimeframe = timeframeMap[newTimeFrame];
-    updateTimeframe(apiTimeframe as UserPositionTimeframe);
-    fetchPositionData();
+    setTimeframe(apiTimeframe as UserPositionTimeframe);
+    getPositions();
   };
 
   if (chartData.length === 0) {
@@ -88,7 +83,10 @@ export default function Chart() {
         data={chartData}
         onCurrentIndexChange={(index) => {
           triggerHaptic("light");
-          updateBalance(chartDataRef.current[index].value);
+          useUser.setState((state) => ({
+            ...state,
+            balance: chartDataRef.current[index].value,
+          }));
         }}
       >
         <LineChart width={375} height={200}>
@@ -102,7 +100,10 @@ export default function Chart() {
             }}
             onEnded={() => {
               triggerHaptic("light");
-              updateBalance(chartDataRef.current[chartData.length - 1].value);
+              useUser.setState((state) => ({
+                ...state,
+                balance: chartDataRef.current[chartData.length - 1].value,
+              }));
             }}
           >
             {/* <LineChart.Tooltip cursorGutter={60} xGutter={16} yGutter={0} /> */}

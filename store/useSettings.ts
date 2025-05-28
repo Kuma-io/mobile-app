@@ -1,98 +1,60 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  getUserActions,
-  getUserPositions,
-  getApy,
-  getApyHistory,
-  registerUserNotification,
-  getUserNotifications,
-  getCurrencyRate,
-} from "@/lib/api";
+import { getCurrencyRate } from "@/lib/api/currency";
 import * as types from "@/types";
 import { toast } from "sonner-native";
 import { triggerHaptic } from "@/utils/haptics";
-import useUser from "./useUser";
+
 interface SettingsState {
+  timeframe: types.UserPositionTimeframe;
   currencySlug: types.CurrencySlug;
   currencyRate: number;
-  notification: boolean;
-  timeframe: types.UserPositionTimeframe;
 
-  // Methods
-  updateCurrencySlug: (currencySlug: types.CurrencySlug) => void;
-  updateNotification: (notification: boolean) => Promise<void>;
-  fetchCurrencyRate: () => Promise<void>;
-  fetchNotification: () => Promise<void>;
-  updateTimeframe: (timeframe: types.UserPositionTimeframe) => void;
+  // -- METHODS --
+  setTimeframe: (timeframe: types.UserPositionTimeframe) => void;
+  getCurrency: (
+    currencySlug: types.CurrencySlug,
+    triggerToast: boolean
+  ) => Promise<void>;
   reset: () => void;
 }
 
 const useSettings = create<SettingsState>()(
   persist(
     (set, get) => ({
+      timeframe: "1H" as types.UserPositionTimeframe,
       currencySlug: "USD" as types.CurrencySlug,
       currencyRate: 1,
-      notification: true,
-      timeframe: "1H" as types.UserPositionTimeframe,
 
-      // Methods
-      updateNotification: async (notification: boolean) => {
-        const { walletAddress } = useUser.getState();
-        if (!walletAddress) {
-          console.error("No wallet address available");
-          return;
-        }
-        try {
-          await registerUserNotification(walletAddress, notification);
-
-          triggerHaptic("success");
-          set((state) => ({
-            notification,
-          }));
-        } catch (error) {
-          console.error("Error updating notification", error);
-        }
-      },
-      updateCurrencySlug: (currencySlug: types.CurrencySlug) => {
-        toast.success("Currency updated to " + currencySlug);
-        triggerHaptic("success");
-        set((state) => ({
-          currencySlug,
-        }));
-        get().fetchCurrencyRate();
-      },
-      fetchNotification: async () => {
-        const { walletAddress } = useUser.getState();
-        if (!walletAddress) {
-          console.error("No wallet address available");
-          return;
-        }
-        const json = await getUserNotifications(walletAddress);
-        set((state) => ({
-          notification: json,
-        }));
-      },
-      fetchCurrencyRate: async () => {
-        const { currencySlug } = get();
-        const json = await getCurrencyRate(currencySlug);
-        set((state) => ({
-          currencyRate: json,
-        }));
-      },
-      updateTimeframe: (timeframe: types.UserPositionTimeframe) =>
+      // -- METHODS --
+      setTimeframe: (timeframe: types.UserPositionTimeframe) =>
         set((state) => ({
           ...state,
           timeframe,
         })),
+
+      getCurrency: async (
+        currencySlug: types.CurrencySlug,
+        triggerToast: boolean = true
+      ) => {
+        if (triggerToast) {
+          toast.success("Currency updated to " + currencySlug);
+          triggerHaptic("success");
+        }
+        const rate = await getCurrencyRate(currencySlug);
+        set((state) => ({
+          ...state,
+          currencyRate: rate,
+        }));
+      },
+
       reset: () =>
         set((state) => ({
           ...state,
+          timeframe: "1H" as types.UserPositionTimeframe,
           currencySlug: "USD" as types.CurrencySlug,
           currencyRate: 1,
-          notification: true,
-          timeframe: "1H" as types.UserPositionTimeframe,
         })),
     }),
     {
@@ -101,7 +63,6 @@ const useSettings = create<SettingsState>()(
       partialize: (state) => ({
         currencySlug: state.currencySlug,
         currencyRate: state.currencyRate,
-        notification: state.notification,
       }),
       onRehydrateStorage: () => (state) => {
         console.log("Rehydrated state:", state);

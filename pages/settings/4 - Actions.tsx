@@ -5,7 +5,7 @@ import { Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import useUser from "@/store/useUser";
 import useSettings from "@/store/useSettings";
-import useProtocol from "@/store/useProtocol";
+import useAave from "@/store/useAave";
 import { resetCache } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { triggerHaptic } from "@/utils/haptics";
@@ -16,7 +16,7 @@ export default function Actions() {
   const { logout } = usePrivy();
   const { reset: resetUser } = useUser();
   const { reset: resetSettings } = useSettings();
-  const { reset: resetProtocol } = useProtocol();
+  const { reset: resetAave } = useAave();
   return (
     <View
       style={{
@@ -44,7 +44,7 @@ export default function Actions() {
             await logout();
             resetUser();
             resetSettings();
-            resetProtocol();
+            resetAave();
             resetCache();
             router.replace("/");
             triggerHaptic("error");

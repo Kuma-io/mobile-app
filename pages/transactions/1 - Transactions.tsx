@@ -22,9 +22,7 @@ interface GroupedActions {
 }
 
 export default function Transactions() {
-  const {
-    data: { actions },
-  } = useUser();
+  const { actions, getActions } = useUser();
   const { currencySlug, currencyRate } = useSettings();
 
   const groupedActions: GroupedActions = actions.reduce((groups, action) => {
